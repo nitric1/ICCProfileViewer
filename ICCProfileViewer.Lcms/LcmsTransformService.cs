@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using ICCProfileViewer.Core.Colorimetry;
@@ -53,43 +52,12 @@ public sealed class LcmsTransformService : IIccProfileTransformService
                     $"RGB-to-XYZ transform requires an RGB profile, but '{displayName}' uses {inputProfile.ColorSpace}.");
             }
 
-            using var outputProfile = Profile.CreateXYZ(operationContext.Context);
-            using var transform = Transform.Create(
+            return LcmsRgbTransform.ToXyz(
                 operationContext.Context,
                 inputProfile,
-                Cms.TYPE_RGB_DBL,
-                outputProfile,
-                Cms.TYPE_XYZ_DBL,
+                colors,
                 MapIntent(renderingIntent),
-                CmsFlags.None);
-
-            var inputValues = new double[colors.Count * 3];
-            for (var index = 0; index < colors.Count; index++)
-            {
-                var color = colors[index];
-                var offset = index * 3;
-                inputValues[offset] = color.Red;
-                inputValues[offset + 1] = color.Green;
-                inputValues[offset + 2] = color.Blue;
-            }
-
-            var outputValues = new double[inputValues.Length];
-            transform.DoTransform(
-                MemoryMarshal.AsBytes(inputValues.AsSpan()),
-                MemoryMarshal.AsBytes(outputValues.AsSpan()),
-                colors.Count);
-
-            var results = new XyzColor[colors.Count];
-            for (var index = 0; index < results.Length; index++)
-            {
-                var offset = index * 3;
-                results[index] = new XyzColor(
-                    outputValues[offset],
-                    outputValues[offset + 1],
-                    outputValues[offset + 2]);
-            }
-
-            return results;
+                adaptationState: null);
         }
         catch (LcmsNativeLibraryException)
         {

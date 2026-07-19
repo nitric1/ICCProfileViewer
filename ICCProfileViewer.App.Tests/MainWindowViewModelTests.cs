@@ -243,6 +243,7 @@ public sealed class MainWindowViewModelTests
                 new XyzColor(0.9642, 1, 0.8249),
                 new XyzColor(0, 0, 0),
                 null),
+            null,
             new[] { new IccTagInfo("desc", "mluc", 256, 128) });
     }
 

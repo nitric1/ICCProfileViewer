@@ -432,6 +432,13 @@ RGB Matrix/TRC 프로필은 다음 원칙으로 처리한다.
 5. 태그 직접 계산 경로는 동일 결과를 내는지 테스트 fixture로 검증한다.
 6. 계산 경로와 적용한 adaptation을 결과 메타데이터에 기록한다.
 
+구현에서는 RGB Matrix/TRC 프로필에 한해 LittleCMS context의 adaptation state를
+`0`으로 설정한 absolute-colorimetric RGB-to-XYZ transform을 사용한다. 이를 통해
+D50 PCS에 적응된 `rXYZ`/`gXYZ`/`bXYZ`를 단순히 xy로 바꾸지 않고 device-side
+원색과 백색점을 복원한다. 결과에는 원본 XYZ와 `xy`/`u'v'`, 계산 방법, 정확도,
+adaptation 설명을 함께 보존한다. LUT RGB 및 비 RGB 프로필에는 삼각형 색역을
+생성하지 않는다.
+
 ## 9. 기준 색역 데이터
 
 기준 색역은 코드에 상수로 관리하되, 좌표와 출처를 테스트에서도 고정한다.
@@ -670,7 +677,7 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 
 ### 단계 3: 색도 계산 엔진
 
-상태: 진행 중. `XyChromaticity`, `UvPrimeChromaticity` 좌표 타입과 scale-invariant `XYZ -> xy`, `XYZ -> u'v'`, `xy <-> u'v'` 변환 및 undefined/non-finite 입력 처리, sRGB·Display P3·DCI-P3·Adobe RGB (1998)·BT.2020 기준 색역 카탈로그, CIE 1931 2° spectral locus 데이터를 구현했다. Matrix/TRC gamut 추출과 chromatic adaptation 검증은 남아 있다.
+상태: 진행 중. `XyChromaticity`, `UvPrimeChromaticity` 좌표 타입과 scale-invariant `XYZ -> xy`, `XYZ -> u'v'`, `xy <-> u'v'` 변환 및 undefined/non-finite 입력 처리, sRGB·Display P3·DCI-P3·Adobe RGB (1998)·BT.2020 기준 색역 카탈로그, CIE 1931 2° spectral locus 데이터, LittleCMS unadapted absolute-colorimetric transform 기반 Matrix/TRC gamut 추출을 구현했다. `chad` 태그 직접 계산과의 교차 검증은 남아 있다.
 
 - 색도 좌표 타입과 변환식
 - 기준 색역 정의

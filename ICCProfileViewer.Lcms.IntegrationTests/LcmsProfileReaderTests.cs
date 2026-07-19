@@ -41,6 +41,25 @@ public sealed class LcmsProfileReaderTests
         AssertXyz(profile.ColorTags.MediaWhitePoint, 0.9504547119140625, 1, 1.08905029296875);
         AssertXyz(profile.ColorTags.MediaBlackPoint, 0, 0, 0);
         Assert.IsNull(profile.ColorTags.ChromaticAdaptationMatrix);
+        Assert.IsNotNull(profile.Gamut);
+        Assert.AreEqual(
+            GamutCalculationMethod.MatrixTrcDeviceTransform,
+            profile.Gamut.CalculationMethod);
+        Assert.AreEqual(GamutBoundaryAccuracy.Exact, profile.Gamut.Accuracy);
+        StringAssert.Contains(profile.Gamut.AdaptationDescription, "adaptation state 0");
+        AssertXy(profile.Gamut.Red.Xy, 0.6400, 0.3300);
+        AssertXy(profile.Gamut.Green.Xy, 0.3000, 0.6000);
+        AssertXy(profile.Gamut.Blue.Xy, 0.1500, 0.0600);
+        AssertXy(profile.Gamut.WhitePoint.Xy, 0.3127, 0.3290);
+
+        Assert.IsTrue(profile.ColorTags.RedColorant.HasValue);
+        var pcsRed = ChromaticityConverter.ToXy(
+            profile.ColorTags.RedColorant.GetValueOrDefault());
+        Assert.IsNotNull(pcsRed);
+        Assert.IsGreaterThan(
+            0.001,
+            System.Math.Abs(pcsRed.Value.X - profile.Gamut.Red.Xy.X),
+            "The device-side primary must not be a naive xy conversion of the D50 PCS colorant.");
     }
 
     [TestMethod]
@@ -57,6 +76,7 @@ public sealed class LcmsProfileReaderTests
         Assert.AreEqual("Lab", profile.ProfileConnectionSpace);
         Assert.AreEqual(11, profile.TagCount);
         Assert.IsFalse(profile.IsMatrixShaper);
+        Assert.IsNull(profile.Gamut);
         Assert.IsNull(profile.ColorTags.RedColorant);
         Assert.IsNotNull(profile.ColorTags.ChromaticAdaptationMatrix);
         Assert.AreEqual(
@@ -110,5 +130,14 @@ public sealed class LcmsProfileReaderTests
         Assert.AreEqual(expectedX, actual.Value.X, 0.0000001);
         Assert.AreEqual(expectedY, actual.Value.Y, 0.0000001);
         Assert.AreEqual(expectedZ, actual.Value.Z, 0.0000001);
+    }
+
+    private static void AssertXy(
+        XyChromaticity actual,
+        double expectedX,
+        double expectedY)
+    {
+        Assert.AreEqual(expectedX, actual.X, 0.0001);
+        Assert.AreEqual(expectedY, actual.Y, 0.0001);
     }
 }

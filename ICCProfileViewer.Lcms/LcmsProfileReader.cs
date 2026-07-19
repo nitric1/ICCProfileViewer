@@ -11,6 +11,14 @@ namespace ICCProfileViewer.Lcms;
 
 public sealed class LcmsProfileReader : IIccProfileReader
 {
+    private static readonly RgbColor[] PrimariesAndWhite =
+    [
+        new RgbColor(1, 0, 0),
+        new RgbColor(0, 1, 0),
+        new RgbColor(0, 0, 1),
+        new RgbColor(1, 1, 1),
+    ];
+
     public const int MaximumProfileSizeInBytes = ProfileStreamLoader.MaximumProfileSizeInBytes;
 
     public async Task<IccProfileInfo> ReadAsync(
@@ -73,6 +81,7 @@ public sealed class LcmsProfileReader : IIccProfileReader
                 profile.TagCount,
                 profile.IsMatrixShaper,
                 ReadColorTags(profile),
+                ReadGamut(operationContext.Context, profile),
                 tags);
         }
         catch (LcmsNativeLibraryException)
@@ -101,6 +110,31 @@ public sealed class LcmsProfileReader : IIccProfileReader
             ReadXyzTag(profile, TagSignature.MediaWhitePoint),
             ReadXyzTag(profile, TagSignature.MediaBlackPoint),
             ReadChromaticAdaptationMatrix(profile));
+    }
+
+    private static GamutBoundary? ReadGamut(Context context, Profile profile)
+    {
+        if (!profile.IsMatrixShaper || profile.ColorSpace != ColorSpaceSignature.RgbData)
+        {
+            return null;
+        }
+
+        var xyz = LcmsRgbTransform.ToXyz(
+            context,
+            profile,
+            PrimariesAndWhite,
+            Intent.AbsoluteColorimetric,
+            adaptationState: 0);
+
+        return new GamutBoundary(
+            ChromaticityPoint.FromXyz("R", ChromaticityPointRole.RedPrimary, xyz[0]),
+            ChromaticityPoint.FromXyz("G", ChromaticityPointRole.GreenPrimary, xyz[1]),
+            ChromaticityPoint.FromXyz("B", ChromaticityPointRole.BluePrimary, xyz[2]),
+            ChromaticityPoint.FromXyz("White", ChromaticityPointRole.WhitePoint, xyz[3]),
+            GamutCalculationMethod.MatrixTrcDeviceTransform,
+            GamutBoundaryAccuracy.Exact,
+            "Little CMS absolute-colorimetric transform with adaptation state 0 " +
+            "to restore device-side chromaticities.");
     }
 
     private static XyzColor? ReadXyzTag(Profile profile, TagSignature tagSignature)

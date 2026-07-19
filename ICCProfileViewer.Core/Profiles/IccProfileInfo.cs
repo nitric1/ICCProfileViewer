@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ICCProfileViewer.Core.Colorimetry;
 
 namespace ICCProfileViewer.Core.Profiles;
 
@@ -22,4 +23,5 @@ public sealed record IccProfileInfo(
     int TagCount,
     bool IsMatrixShaper,
     IccColorTagData ColorTags,
+    GamutBoundary? Gamut,
     IReadOnlyList<IccTagInfo> Tags);
