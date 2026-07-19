@@ -1,0 +1,26 @@
+# Personal Files
+*.vcxproj.user
+*.aps
+*.APS
+*.opensdf
+*.sdf
+*.suo
+*.VC.db
+*.VC.opendb
+
+# Personal Directories
+.vs
+
+# Build Directories
+bin
+obj
+
+# NuGet Packages
+*.nupkg
+*.nuget.g.props
+*.nuget.g.targets
+*.nuget.cache
+**/packages/*
+project.lock.json
+project.assets.json
+*.nuget.dgspec.json
