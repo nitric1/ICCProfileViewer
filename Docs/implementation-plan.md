@@ -202,10 +202,14 @@ lcmsNET upstream 문서는 LittleCMS 2.9 이상을 실행 요구사항으로 명
 - `lcmsNET` 1.2.1은 `net10.0` 프로젝트에서 restore와 build가 가능하다.
 - `Profile.Open(byte[])`를 제공하므로 ICC profile stream을 임시 파일 없이 메모리에서 열 수 있다.
 - `Profile`에서 ICC version, profile class, data color space, PCS, rendering intent, 생성 시각, 설명과 기본 tag count를 읽을 수 있다.
+- `rXYZ`, `gXYZ`, `bXYZ`, `wtpt`, `bkpt`는 `CIEXYZ`로, `chad`는 `CIEXYZTRIPLE`로 typed read할 수 있다. `desc`와 `mluc` 기반 설명은 `GetProfileInfo`로 locale fallback을 적용해 읽을 수 있다.
+- `TYPE_RGB_DBL` 입력과 `TYPE_XYZ_DBL` 출력 transform을 만들 수 있으며, Matrix/TRC fixture의 절대 색도 R/G/B 결과가 PCS colorant 값과 허용 오차 안에서 일치한다.
+- 각 읽기/transform 작업에 전용 LittleCMS context와 오류 callback을 두면 전역 callback 없이 native 오류 코드와 영어 진단 문구를 수집할 수 있다. callback delegate는 context scope가 소유한다.
+- context, profile, output profile, transform을 100회 반복 생성·해제하는 수명 smoke test가 통과한다.
 - `lcmsNET`의 native import 이름은 `lcms2`이며, Windows x64에서는 `NativeLibrary.SetDllImportResolver`로 명시 경로와 앱 로컬 `lcms2.dll`을 우선 탐색할 수 있다.
 - submodule의 v2/v4 test profile을 MSTest 통합 테스트 fixture로 사용하고, 수동 빌드한 Little CMS 2.19 Windows x64 artifact로 검증한다.
 
-태그별 typed read, RGB-to-XYZ transform, 오류 callback 수명, 반복 dispose 검증은 후속 단계 0 작업으로 남긴다.
+raw tag offset/size 추출 가능 여부, 앱 로컬 및 시스템 설치본 탐색, native library 누락 진단의 격리 process test는 후속 단계 0 작업으로 남긴다.
 
 스파이크 결과 `lcmsNET`에 필요한 API가 일부 없을 경우 전체 바인딩을 교체하지 않고 다음 순서로 대응한다.
 

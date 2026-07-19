@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace ICCProfileViewer.Lcms;
 
-public sealed class LcmsProfileReadException : Exception
+public sealed class LcmsTransformException : Exception
 {
-    public LcmsProfileReadException(
+    public LcmsTransformException(
         string displayName,
         IReadOnlyList<LcmsError> nativeErrors,
         Exception innerException)
@@ -24,6 +24,6 @@ public sealed class LcmsProfileReadException : Exception
         var details = nativeErrors.Count == 0
             ? null
             : $" Little CMS reported: {nativeErrors[^1].Message}";
-        return $"Little CMS could not read ICC profile '{displayName}'.{details}";
+        return $"Little CMS could not transform RGB values from ICC profile '{displayName}'.{details}";
     }
 }

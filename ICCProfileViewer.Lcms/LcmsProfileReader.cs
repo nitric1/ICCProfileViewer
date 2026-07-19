@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using ICCProfileViewer.Core.Colorimetry;
 using ICCProfileViewer.Core.Profiles;
 using lcmsNET;
 
@@ -9,7 +10,7 @@ namespace ICCProfileViewer.Lcms;
 
 public sealed class LcmsProfileReader : IIccProfileReader
 {
-    public const int MaximumProfileSizeInBytes = 64 * 1024 * 1024;
+    public const int MaximumProfileSizeInBytes = ProfileStreamLoader.MaximumProfileSizeInBytes;
 
     public async Task<IccProfileInfo> ReadAsync(
         Stream profileStream,
@@ -24,12 +25,15 @@ public sealed class LcmsProfileReader : IIccProfileReader
             throw new ArgumentException("The ICC profile stream must be readable.", nameof(profileStream));
         }
 
-        var profileBytes = await ReadProfileBytesAsync(profileStream, cancellationToken).ConfigureAwait(false);
+        var profileBytes = await ProfileStreamLoader
+            .ReadAllAsync(profileStream, cancellationToken)
+            .ConfigureAwait(false);
         NativeLibraryBootstrapper.Initialize();
 
+        using var operationContext = new LcmsOperationContext();
         try
         {
-            using var profile = Profile.Open(profileBytes);
+            using var profile = Profile.Open(operationContext.Context, profileBytes);
             var creationDate = profile.GetHeaderCreationDateTime(out var date)
                 ? date
                 : (DateTime?)null;
@@ -51,7 +55,8 @@ public sealed class LcmsProfileReader : IIccProfileReader
                 FormatOptionalSignature(profile.HeaderManufacturer),
                 FormatOptionalSignature(profile.HeaderModel),
                 profile.TagCount,
-                profile.IsMatrixShaper);
+                profile.IsMatrixShaper,
+                ReadColorTags(profile));
         }
         catch (LcmsNativeLibraryException)
         {
@@ -63,39 +68,53 @@ public sealed class LcmsProfileReader : IIccProfileReader
         }
         catch (Exception exception)
         {
-            throw new LcmsProfileReadException(displayName, exception);
+            throw new LcmsProfileReadException(
+                displayName,
+                operationContext.GetErrors(),
+                exception);
         }
     }
 
-    private static async Task<byte[]> ReadProfileBytesAsync(
-        Stream profileStream,
-        CancellationToken cancellationToken)
+    private static IccColorTagData ReadColorTags(Profile profile)
     {
-        using var buffer = new MemoryStream();
-        var chunk = new byte[81920];
+        return new IccColorTagData(
+            ReadXyzTag(profile, TagSignature.RedColorant),
+            ReadXyzTag(profile, TagSignature.GreenColorant),
+            ReadXyzTag(profile, TagSignature.BlueColorant),
+            ReadXyzTag(profile, TagSignature.MediaWhitePoint),
+            ReadXyzTag(profile, TagSignature.MediaBlackPoint),
+            ReadChromaticAdaptationMatrix(profile));
+    }
 
-        while (true)
+    private static XyzColor? ReadXyzTag(Profile profile, TagSignature tagSignature)
+    {
+        if (!profile.HasTag(tagSignature))
         {
-            var bytesRead = await profileStream
-                .ReadAsync(chunk.AsMemory(), cancellationToken)
-                .ConfigureAwait(false);
-            if (bytesRead == 0)
-            {
-                break;
-            }
-
-            if (buffer.Length + bytesRead > MaximumProfileSizeInBytes)
-            {
-                throw new InvalidDataException(
-                    $"ICC profiles larger than {MaximumProfileSizeInBytes / (1024 * 1024)} MiB are not supported.");
-            }
-
-            await buffer
-                .WriteAsync(chunk.AsMemory(0, bytesRead), cancellationToken)
-                .ConfigureAwait(false);
+            return null;
         }
 
-        return buffer.ToArray();
+        var value = profile.ReadTag<CIEXYZ>(tagSignature);
+        return new XyzColor(value.X, value.Y, value.Z);
+    }
+
+    private static Matrix3x3? ReadChromaticAdaptationMatrix(Profile profile)
+    {
+        if (!profile.HasTag(TagSignature.ChromaticAdaptation))
+        {
+            return null;
+        }
+
+        var value = profile.ReadTag<CIEXYZTRIPLE>(TagSignature.ChromaticAdaptation);
+        return new Matrix3x3(
+            value.Red.X,
+            value.Red.Y,
+            value.Red.Z,
+            value.Green.X,
+            value.Green.Y,
+            value.Green.Z,
+            value.Blue.X,
+            value.Blue.Y,
+            value.Blue.Z);
     }
 
     private static string? ReadProfileInfo(Profile profile, InfoType infoType)

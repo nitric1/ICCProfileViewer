@@ -1,6 +1,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using ICCProfileViewer.Core.Colorimetry;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ICCProfileViewer.Lcms.IntegrationTests;
@@ -29,6 +30,12 @@ public sealed class LcmsProfileReaderTests
         Assert.AreEqual(17, profile.TagCount);
         Assert.IsTrue(profile.IsMatrixShaper);
         Assert.IsNotNull(profile.CreationDate);
+        AssertXyz(profile.ColorTags.RedColorant, 0.436065673828125, 0.2224884033203125, 0.013916015625);
+        AssertXyz(profile.ColorTags.GreenColorant, 0.3851470947265625, 0.7168731689453125, 0.097076416015625);
+        AssertXyz(profile.ColorTags.BlueColorant, 0.14306640625, 0.06060791015625, 0.7140960693359375);
+        AssertXyz(profile.ColorTags.MediaWhitePoint, 0.9504547119140625, 1, 1.08905029296875);
+        AssertXyz(profile.ColorTags.MediaBlackPoint, 0, 0, 0);
+        Assert.IsNull(profile.ColorTags.ChromaticAdaptationMatrix);
     }
 
     [TestMethod]
@@ -45,6 +52,16 @@ public sealed class LcmsProfileReaderTests
         Assert.AreEqual("Lab", profile.ProfileConnectionSpace);
         Assert.AreEqual(11, profile.TagCount);
         Assert.IsFalse(profile.IsMatrixShaper);
+        Assert.IsNull(profile.ColorTags.RedColorant);
+        Assert.IsNotNull(profile.ColorTags.ChromaticAdaptationMatrix);
+        Assert.AreEqual(
+            1.0480194091796875,
+            profile.ColorTags.ChromaticAdaptationMatrix.Value.M11,
+            0.0000001);
+        Assert.AreEqual(
+            0.75213623046875,
+            profile.ColorTags.ChromaticAdaptationMatrix.Value.M33,
+            0.0000001);
     }
 
     [TestMethod]
@@ -57,5 +74,20 @@ public sealed class LcmsProfileReaderTests
 
         Assert.AreEqual("bad.icc", exception.DisplayName);
         Assert.IsNotNull(exception.InnerException);
+        Assert.HasCount(1, exception.NativeErrors);
+        Assert.AreEqual(11, exception.NativeErrors[0].Code);
+        StringAssert.Contains(exception.NativeErrors[0].Message, "invalid signature");
+    }
+
+    private static void AssertXyz(
+        XyzColor? actual,
+        double expectedX,
+        double expectedY,
+        double expectedZ)
+    {
+        Assert.IsNotNull(actual);
+        Assert.AreEqual(expectedX, actual.Value.X, 0.0000001);
+        Assert.AreEqual(expectedY, actual.Value.Y, 0.0000001);
+        Assert.AreEqual(expectedZ, actual.Value.Z, 0.0000001);
     }
 }

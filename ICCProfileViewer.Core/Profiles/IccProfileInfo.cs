@@ -19,4 +19,5 @@ public sealed record IccProfileInfo(
     string? HeaderManufacturerSignature,
     string? HeaderModelSignature,
     int TagCount,
-    bool IsMatrixShaper);
+    bool IsMatrixShaper,
+    IccColorTagData ColorTags);
