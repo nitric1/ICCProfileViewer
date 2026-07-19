@@ -419,7 +419,7 @@ u' = 4X / d
 v' = 9Y / d
 ```
 
-분모가 0에 가까운 경우 결과 없음으로 처리한다. 계산에는 `double`을 사용한다.
+분모가 0에 가까운 경우 결과 없음으로 처리한다. 계산에는 `double`을 사용한다. XYZ 입력은 가장 큰 절대 성분으로 먼저 정규화하여 색도의 scale invariance를 유지하고, 모든 성분이 0이거나 비유한 값이 포함되거나 정규화된 분모의 절대값이 `1e-12` 이하이면 nullable 결과 없음으로 반환한다. `xy`와 `u'v'` 사이의 직접 변환도 같은 정책을 적용한다.
 
 ### 8.2 Matrix/TRC RGB 프로필
 
@@ -657,6 +657,8 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 - 오류 상태 및 로그
 
 ### 단계 3: 색도 계산 엔진
+
+상태: 진행 중. `XyChromaticity`, `UvPrimeChromaticity` 좌표 타입과 scale-invariant `XYZ -> xy`, `XYZ -> u'v'`, `xy <-> u'v'` 변환 및 undefined/non-finite 입력 처리를 구현했다. 기준 색역, spectral locus, Matrix/TRC gamut 추출과 chromatic adaptation 검증은 남아 있다.
 
 - 색도 좌표 타입과 변환식
 - 기준 색역 정의
