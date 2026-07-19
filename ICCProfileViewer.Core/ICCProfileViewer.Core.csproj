@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Colorimetry/Data/CIE_cc_1931_2deg.csv"
+                      LogicalName="ICCProfileViewer.Core.Colorimetry.Data.CIE_cc_1931_2deg.csv" />
+    <None Update="Colorimetry/Data/CIE_cc_1931_2deg.NOTICE.md"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest"
+          TargetPath="ThirdPartyNotices/CIE_cc_1931_2deg.NOTICE.md" />
+  </ItemGroup>
+
 </Project>

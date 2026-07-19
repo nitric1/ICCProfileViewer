@@ -451,6 +451,18 @@ UI 명칭은 다음 정책을 따른다.
 - `P3-D65`라는 모호한 단독 명칭은 사용하지 않는다.
 - Display P3와 DCI-P3는 2차원 원색 삼각형이 같지만 백색점과 전달 함수가 다르다는 설명을 도움말에 제공한다.
 
+### 9.1 Spectral locus 데이터
+
+CIE가 공개한 `CIE_cc_1931_2deg.csv` 원본을 변경하지 않고 Core의 embedded
+resource로 포함한다. 이 데이터는 CIE 1931 2° standard colorimetric observer의
+360–830 nm 범위를 1 nm 간격으로 제공한다. Core는 원본 `xy` 좌표를 로드하고
+CIE 1976 `u'v'` 좌표를 계산하여 두 다이어그램에서 같은 파장 표본을 사용한다.
+
+- 데이터셋 DOI: `10.25039/CIE.DS.mifmy4x4`
+- 라이선스: CC BY-SA 4.0
+- 원본 SHA-256: `5a3f0582ea0907867c7a2718051bbdc04f39e758d8c09e628930efc62386e399`
+- attribution 및 재배포 조건: `ICCProfileViewer.Core/Colorimetry/Data/CIE_cc_1931_2deg.NOTICE.md`
+
 ## 10. 다이어그램 렌더링
 
 ### 10.1 구성
@@ -658,7 +670,7 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 
 ### 단계 3: 색도 계산 엔진
 
-상태: 진행 중. `XyChromaticity`, `UvPrimeChromaticity` 좌표 타입과 scale-invariant `XYZ -> xy`, `XYZ -> u'v'`, `xy <-> u'v'` 변환 및 undefined/non-finite 입력 처리, sRGB·Display P3·DCI-P3·Adobe RGB (1998)·BT.2020 기준 색역 카탈로그를 구현했다. spectral locus, Matrix/TRC gamut 추출과 chromatic adaptation 검증은 남아 있다.
+상태: 진행 중. `XyChromaticity`, `UvPrimeChromaticity` 좌표 타입과 scale-invariant `XYZ -> xy`, `XYZ -> u'v'`, `xy <-> u'v'` 변환 및 undefined/non-finite 입력 처리, sRGB·Display P3·DCI-P3·Adobe RGB (1998)·BT.2020 기준 색역 카탈로그, CIE 1931 2° spectral locus 데이터를 구현했다. Matrix/TRC gamut 추출과 chromatic adaptation 검증은 남아 있다.
 
 - 색도 좌표 타입과 변환식
 - 기준 색역 정의
@@ -742,8 +754,7 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 6. 공개 배포물을 시스템 의존형으로 제공할지 앱 로컬 library를 포함할지
 7. MVP 이후 macOS에서 지원할 architecture 범위
 8. MVP 이후 Linux에서 지원할 배포판과 architecture 범위
-9. spectral locus/CMF 데이터의 저장 형식과 배포 라이선스
-10. MVP 색도 배경을 컬러로 채울지, 정확도를 우선하여 중성 배경과 경계선만 제공할지
+9. MVP 색도 배경을 컬러로 채울지, 정확도를 우선하여 중성 배경과 경계선만 제공할지
 
 ## 19. 참고 자료
 
@@ -768,3 +779,5 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 - [ICC DCI-P3 정의](https://registry.color.org/rgb-registry/dcip3)
 - [Adobe RGB (1998) 정의](https://www.adobe.com/digitalimag/pdfs/AdobeRGB1998.pdf)
 - [ICC BT.2020 정의](https://registry.color.org/rgb-registry/bt2020)
+- [CIE 1931 2° spectrum-locus 공개 데이터](https://cie.co.at/datatable/cie-1931-chromaticity-coordinates-spectrum-loci-2-degree-observer)
+- [Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
