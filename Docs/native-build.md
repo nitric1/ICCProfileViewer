@@ -101,6 +101,13 @@ The Windows integration tests set `ICC_PROFILE_VIEWER_LCMS_PATH` to `Artifacts/n
 dotnet test ICCProfileViewer.slnx -c Debug
 ```
 
+The test suite also starts an isolated helper process to verify all Windows lookup branches independently:
+
+1. `ICC_PROFILE_VIEWER_LCMS_PATH`
+2. app-local `lcms2.dll`
+3. the default Windows loader with a separately supplied `PATH` entry
+4. an actionable error for a missing explicitly configured DLL
+
 ## 3. macOS and Linux
 
 macOS and Linux support is planned after the MVP. Neither platform is officially supported until it has been tested on physical hardware or in CI.

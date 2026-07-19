@@ -207,9 +207,11 @@ lcmsNET upstream 문서는 LittleCMS 2.9 이상을 실행 요구사항으로 명
 - 각 읽기/transform 작업에 전용 LittleCMS context와 오류 callback을 두면 전역 callback 없이 native 오류 코드와 영어 진단 문구를 수집할 수 있다. callback delegate는 context scope가 소유한다.
 - context, profile, output profile, transform을 100회 반복 생성·해제하는 수명 smoke test가 통과한다.
 - `lcmsNET`의 native import 이름은 `lcms2`이며, Windows x64에서는 `NativeLibrary.SetDllImportResolver`로 명시 경로와 앱 로컬 `lcms2.dll`을 우선 탐색할 수 있다.
+- 별도 process test host에서 명시 경로, 앱 로컬 DLL, `PATH`를 통한 OS 기본 탐색, 존재하지 않는 명시 경로의 진단 오류를 서로 격리해 검증했다.
+- LittleCMS 2.19에는 `cmsGetTagOffsetAndSize`가 추가되었지만 `lcmsNET` 1.2.1은 이를 노출하지 않고, 2.19 이전 LittleCMS에는 해당 symbol이 없다. 최소 2.9 호환성을 유지하기 위해 고정 ICC tag directory를 Core에서 사전 검사하여 tag signature, type signature, offset, size를 추출한다.
 - submodule의 v2/v4 test profile을 MSTest 통합 테스트 fixture로 사용하고, 수동 빌드한 Little CMS 2.19 Windows x64 artifact로 검증한다.
 
-raw tag offset/size 추출 가능 여부, 앱 로컬 및 시스템 설치본 탐색, native library 누락 진단의 격리 process test는 후속 단계 0 작업으로 남긴다.
+단계 0 사전 검증 항목은 완료했다. 이후 기능 구현에서는 raw tag parser가 먼저 크기, `acsp`, tag count, offset/size 범위를 검사하고, LittleCMS가 tag 의미 해석과 color transform을 담당한다.
 
 스파이크 결과 `lcmsNET`에 필요한 API가 일부 없을 경우 전체 바인딩을 교체하지 않고 다음 순서로 대응한다.
 
@@ -614,6 +616,8 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 ## 15. 구현 단계
 
 ### 단계 0: lcmsNET/네이티브 스파이크
+
+상태: 완료 (2026-07-19)
 
 - Little-CMS를 `External/Little-CMS` submodule로 추가하고 release commit 고정
 - `lcmsNET` 패키지 참조

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace ICCProfileViewer.Core.Profiles;
 
@@ -20,4 +21,5 @@ public sealed record IccProfileInfo(
     string? HeaderModelSignature,
     int TagCount,
     bool IsMatrixShaper,
-    IccColorTagData ColorTags);
+    IccColorTagData ColorTags,
+    IReadOnlyList<IccTagInfo> Tags);

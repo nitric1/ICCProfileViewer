@@ -14,4 +14,8 @@
     <PackageReference Include="lcmsNET" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="ICCProfileViewer.Lcms.IntegrationTests" />
+  </ItemGroup>
+
 </Project>

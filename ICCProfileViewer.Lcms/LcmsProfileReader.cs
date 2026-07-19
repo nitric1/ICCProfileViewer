@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,16 @@ public sealed class LcmsProfileReader : IIccProfileReader
         var profileBytes = await ProfileStreamLoader
             .ReadAllAsync(profileStream, cancellationToken)
             .ConfigureAwait(false);
+        IReadOnlyList<IccTagInfo> tags;
+        try
+        {
+            tags = IccTagTableParser.Parse(profileBytes);
+        }
+        catch (Exception exception)
+        {
+            throw new LcmsProfileReadException(displayName, Array.Empty<LcmsError>(), exception);
+        }
+
         NativeLibraryBootstrapper.Initialize();
 
         using var operationContext = new LcmsOperationContext();
@@ -37,6 +48,11 @@ public sealed class LcmsProfileReader : IIccProfileReader
             var creationDate = profile.GetHeaderCreationDateTime(out var date)
                 ? date
                 : (DateTime?)null;
+            if (profile.TagCount != tags.Count)
+            {
+                throw new InvalidDataException(
+                    $"The raw ICC tag count ({tags.Count}) does not match Little CMS ({profile.TagCount}).");
+            }
 
             return new IccProfileInfo(
                 displayName,
@@ -44,8 +60,8 @@ public sealed class LcmsProfileReader : IIccProfileReader
                 profile.Version,
                 profile.EncodedICCVersion,
                 profile.DeviceClass.ToString(),
-                FormatSignature((uint)profile.ColorSpace),
-                FormatSignature((uint)profile.PCS),
+                IccSignature.Format((uint)profile.ColorSpace),
+                IccSignature.Format((uint)profile.PCS),
                 creationDate,
                 profile.HeaderRenderingIntent.ToString(),
                 ReadProfileInfo(profile, InfoType.Description),
@@ -56,7 +72,8 @@ public sealed class LcmsProfileReader : IIccProfileReader
                 FormatOptionalSignature(profile.HeaderModel),
                 profile.TagCount,
                 profile.IsMatrixShaper,
-                ReadColorTags(profile));
+                ReadColorTags(profile),
+                tags);
         }
         catch (LcmsNativeLibraryException)
         {
@@ -125,19 +142,6 @@ public sealed class LcmsProfileReader : IIccProfileReader
 
     private static string? FormatOptionalSignature(uint signature)
     {
-        return signature == 0 ? null : FormatSignature(signature);
-    }
-
-    private static string FormatSignature(uint signature)
-    {
-        Span<char> characters = stackalloc char[4];
-        for (var index = 0; index < characters.Length; index++)
-        {
-            var shift = 24 - index * 8;
-            var value = (byte)(signature >> shift);
-            characters[index] = value is >= 0x20 and <= 0x7e ? (char)value : '?';
-        }
-
-        return new string(characters).TrimEnd();
+        return signature == 0 ? null : IccSignature.Format(signature);
     }
 }

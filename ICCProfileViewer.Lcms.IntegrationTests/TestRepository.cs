@@ -15,6 +15,25 @@ internal static class TestRepository
         "Release",
         "lcms2.dll");
 
+    public static string IntegrationTestHostOutputDirectory => Path.Combine(
+        Root,
+        "ICCProfileViewer.Lcms.IntegrationTestHost",
+        "bin",
+        BuildConfiguration,
+        "net10.0");
+
+    private static string BuildConfiguration
+    {
+        get
+        {
+            var targetFrameworkDirectory = new DirectoryInfo(
+                AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar));
+            return targetFrameworkDirectory.Parent?.Name
+                ?? throw new DirectoryNotFoundException(
+                    $"Could not determine the build configuration from '{AppContext.BaseDirectory}'.");
+        }
+    }
+
     public static string ProfilePath(string fileName) => Path.Combine(
         Root,
         "External",

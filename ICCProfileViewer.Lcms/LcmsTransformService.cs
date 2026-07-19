@@ -32,6 +32,15 @@ public sealed class LcmsTransformService : IIccProfileTransformService
         var profileBytes = await ProfileStreamLoader
             .ReadAllAsync(profileStream, cancellationToken)
             .ConfigureAwait(false);
+        try
+        {
+            IccTagTableParser.Parse(profileBytes);
+        }
+        catch (Exception exception)
+        {
+            throw new LcmsTransformException(displayName, Array.Empty<LcmsError>(), exception);
+        }
+
         NativeLibraryBootstrapper.Initialize();
 
         using var operationContext = new LcmsOperationContext();

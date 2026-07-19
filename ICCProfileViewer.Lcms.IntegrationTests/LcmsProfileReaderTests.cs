@@ -28,6 +28,11 @@ public sealed class LcmsProfileReaderTests
         Assert.AreEqual("Perceptual", profile.RenderingIntent);
         Assert.AreEqual("Test profile, not suitable for real use", profile.Description);
         Assert.AreEqual(17, profile.TagCount);
+        Assert.HasCount(17, profile.Tags);
+        Assert.AreEqual("cprt", profile.Tags[0].Signature);
+        Assert.AreEqual("text", profile.Tags[0].TypeSignature);
+        Assert.AreEqual(336u, profile.Tags[0].Offset);
+        Assert.AreEqual(35u, profile.Tags[0].Size);
         Assert.IsTrue(profile.IsMatrixShaper);
         Assert.IsNotNull(profile.CreationDate);
         AssertXyz(profile.ColorTags.RedColorant, 0.436065673828125, 0.2224884033203125, 0.013916015625);
@@ -74,9 +79,8 @@ public sealed class LcmsProfileReaderTests
 
         Assert.AreEqual("bad.icc", exception.DisplayName);
         Assert.IsNotNull(exception.InnerException);
-        Assert.HasCount(1, exception.NativeErrors);
-        Assert.AreEqual(11, exception.NativeErrors[0].Code);
-        StringAssert.Contains(exception.NativeErrors[0].Message, "invalid signature");
+        Assert.IsEmpty(exception.NativeErrors);
+        Assert.IsInstanceOfType<InvalidDataException>(exception.InnerException);
     }
 
     private static void AssertXyz(

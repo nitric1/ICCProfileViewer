@@ -10,9 +10,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ICCProfileViewer.Core\ICCProfileViewer.Core.csproj" />
-    <ProjectReference Include="..\ICCProfileViewer.Lcms\ICCProfileViewer.Lcms.csproj" />
-    <ProjectReference Include="..\ICCProfileViewer.Lcms.IntegrationTestHost\ICCProfileViewer.Lcms.IntegrationTestHost.csproj"
-                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
