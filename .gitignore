@@ -14,6 +14,7 @@
 # Build Directories
 bin
 obj
+/Artifacts/
 
 # NuGet Packages
 *.nupkg

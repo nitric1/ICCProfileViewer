@@ -15,7 +15,7 @@
 | UI 패턴 | MVVM | 화면 상태와 ICC/색도 계산 로직 분리 |
 | ICC 엔진 | LittleCMS 2 | ICC v2/v4 처리와 색 변환 담당 |
 | .NET 바인딩 | `lcmsNET` 1.2.1 | 구현 시작 시 최신 호환 버전을 다시 확인하고 고정 |
-| LittleCMS 소스 | `mm2/Little-CMS` Git submodule | 선택적 수동 source build, 검증한 release commit에 고정 |
+| LittleCMS 소스 | `mm2/Little-CMS` Git submodule | `lcms2.19.1` (`21c582a594fe5279f90c0b93437c398f93bf62b0`)에 고정 |
 | 네이티브 준비 | MVP는 Windows 수동 script | `.slnx` build에서는 LittleCMS를 빌드하지 않으며 macOS·Linux 설치 경로는 MVP 이후 마련 |
 | 다이어그램 | Avalonia 커스텀 컨트롤 | 벡터 경계선과 캐시된 래스터 배경을 조합 |
 | 테스트 | xUnit | 순수 계산 단위 테스트와 네이티브 통합 테스트 분리 |
@@ -205,18 +205,17 @@ lcmsNET upstream 문서는 LittleCMS 2.9 이상을 실행 요구사항으로 명
 
 ### 6.2 Little-CMS Git submodule
 
-Little-CMS 소스는 재현 가능한 수동 source build가 필요할 때 사용할 수 있도록 `External/Little-CMS`에 Git submodule로 추가한다.
+Little-CMS 소스는 재현 가능한 수동 source build가 필요할 때 사용할 수 있도록 `External/Little-CMS`에 Git submodule로 포함한다. 현재 `lcms2.19.1`의 commit `21c582a594fe5279f90c0b93437c398f93bf62b0`에 고정한다.
 
 ```powershell
-git submodule add https://github.com/mm2/Little-CMS.git External/Little-CMS
-git -C External/Little-CMS checkout <검증한-release-tag-or-commit>
-git add .gitmodules External/Little-CMS
+git submodule update --init --recursive
+git -C External/Little-CMS rev-parse HEAD
 ```
 
 정책은 다음과 같다.
 
 - `master`를 따라가지 않고 검증한 release commit에 고정한다.
-- 최초 기준은 문서 작성 시점의 안정판 `lcms2.19.1`을 대상으로 검증한다.
+- 최초 기준은 문서 작성 시점의 안정판 `lcms2.19.1`이며 Windows x64 source build를 검증했다.
 - 시스템에 설치된 LittleCMS를 사용할 개발자는 submodule을 초기화하지 않아도 된다.
 - source build가 필요할 때만 `git submodule update --init --recursive`를 실행한다.
 - 처음부터 source build를 할 clone에서는 `git clone --recurse-submodules`를 사용할 수 있다.
@@ -267,25 +266,26 @@ MVP에서는 x64만 지원하며 기본값은 `Release x64`로 한다. script의
 1. `External\Little-CMS` submodule과 `Projects\VC*` 디렉터리를 확인한다.
 2. Visual Studio Installer에 포함된 `vswhere.exe`와 component ID `Microsoft.VisualStudio.Component.VC.Tools.x86.x64`로 C++ toolset이 설치된 모든 Visual Studio/Build Tools instance를 조회한다.
 3. 설치 version이 가장 높은 instance부터 검사한다.
-4. 해당 instance의 product line과 일치하는 LittleCMS solution 디렉터리(예: `VC2026`, `VC2022`)가 있는 첫 조합을 선택한다.
-5. 선택한 instance 안에서 기본으로 활성화된 가장 높은 VC++ toolset을 사용한다.
-6. 필요한 경우 선택한 instance의 `VsDevCmd.bat`를 `call`하여 host/target architecture 환경을 구성한다.
-7. LittleCMS solution의 shared-library project를 MSBuild로 빌드한다.
-8. 결과 DLL을 `Artifacts\native\<rid>\<Configuration>\`에 복사하고 version, compiler, solution 경로를 출력한다.
+4. 해당 instance의 product line과 일치하는 LittleCMS solution 디렉터리(`VC2026`, `VC2022`, `VC2019`)가 있는 첫 조합을 선택한다.
+5. 각 solution에 고정된 toolset(`v145`, `v143`, `v142`)을 사용하고 임의 retarget은 하지 않는다.
+6. Developer Command Prompt 또는 Developer PowerShell에서 실행되었는지 확인한다.
+7. LittleCMS solution의 `lcms2_DLL` target만 MSBuild로 빌드한다.
+8. 결과 DLL과 선택적 LIB/PDB를 `Artifacts\native\<rid>\<Configuration>\`에 복사하고 commit, compiler, solution 정보를 `build-info.txt`에 기록한다.
 
 탐색의 기준이 되는 `vswhere` 호출은 다음 형태로 한다.
 
 ```bat
 "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" ^
-  -all -products * ^
+  -latest -prerelease -products * ^
   -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 ^
-  -format json
+  -version "[18.0,19.0)" ^
+  -property installationPath
 ```
 
 script는 다음 원칙을 따른다.
 
 - 현재 Developer Command Prompt 환경보다 더 높은 호환 Visual Studio/VC++ 설치가 있으면 높은 설치를 선택한다.
-- `vswhere`를 찾지 못하면 현재 Developer Command Prompt의 `VSINSTALLDIR`, `VisualStudioVersion`, `VCToolsVersion`을 fallback으로 사용한다.
+- `vswhere`를 찾지 못하면 자동 선택을 중단하고 Visual Studio Installer와 C++ workload 설치 방법을 안내한다.
 - 설치된 Visual Studio와 일치하는 `Projects\VCyyyy` 디렉터리가 없으면 임의로 낮은 solution을 빌드하지 않고, 발견한 설치/디렉터리 목록과 해결 방법을 출력한다.
 - `.sln` 파일명과 DLL project/output 경로는 고정한 submodule revision을 기준으로 script에 명시한다. runtime glob으로 우연한 파일을 선택하지 않는다.
 - Visual Studio 또는 C++ Desktop workload를 자동 설치하지 않는다.
