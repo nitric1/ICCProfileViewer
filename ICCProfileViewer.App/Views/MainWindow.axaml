@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:ICCProfileViewer.App.ViewModels"
+        xmlns:profiles="using:ICCProfileViewer.Core.Profiles"
         x:Class="ICCProfileViewer.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="{Binding WindowTitle}"
@@ -17,13 +18,18 @@
       <Grid ColumnDefinitions="Auto,16,*,Auto" VerticalAlignment="Center">
         <Button Grid.Column="0"
                 Content="Open Profile"
-                IsEnabled="False"
-                ToolTip.Tip="Profile selection will be implemented in the next step." />
+                IsEnabled="{Binding CanOpenProfile}"
+                Click="OpenProfileClick"
+                ToolTip.Tip="Open an ICC or ICM color profile." />
         <StackPanel Grid.Column="2" Spacing="2">
           <TextBlock Text="{Binding ProfileName}" FontWeight="SemiBold" />
           <TextBlock Text="{Binding StatusMessage}"
                      Foreground="{DynamicResource ThemeForegroundLowBrush}"
                      FontSize="12" />
+          <ProgressBar IsVisible="{Binding IsLoading}"
+                       IsIndeterminate="True"
+                       Height="2"
+                       Margin="0,4,0,0" />
         </StackPanel>
         <Border Grid.Column="3"
                 Padding="10,5"
@@ -34,7 +40,7 @@
       </Grid>
     </Border>
 
-    <Grid Grid.Row="1" ColumnDefinitions="320,*">
+    <Grid Grid.Row="1" ColumnDefinitions="400,*">
       <Border Grid.Column="0"
               Padding="18"
               BorderBrush="{DynamicResource ThemeBorderLowBrush}"
@@ -43,28 +49,57 @@
           <StackPanel Spacing="20">
             <StackPanel Spacing="10">
               <TextBlock Text="Profile Summary" FontSize="18" FontWeight="SemiBold" />
-              <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="8">
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Version" Foreground="{DynamicResource ThemeForegroundLowBrush}" />
-                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding EmptyValue}" />
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Profile class" Foreground="{DynamicResource ThemeForegroundLowBrush}" />
-                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding EmptyValue}" />
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Color space" Foreground="{DynamicResource ThemeForegroundLowBrush}" />
-                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding EmptyValue}" />
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="PCS" Foreground="{DynamicResource ThemeForegroundLowBrush}" />
-                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding EmptyValue}" />
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="Description" Foreground="{DynamicResource ThemeForegroundLowBrush}" />
-                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding EmptyValue}" TextWrapping="Wrap" />
-              </Grid>
+              <ItemsControl ItemsSource="{Binding SummaryRows}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:ProfileMetadataRow">
+                    <Grid ColumnDefinitions="120,*" ColumnSpacing="16" Margin="0,0,0,8">
+                      <TextBlock Grid.Column="0"
+                                 Text="{Binding Label}"
+                                 Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+                      <TextBlock Grid.Column="1"
+                                 Text="{Binding Value}"
+                                 TextWrapping="Wrap" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
             </StackPanel>
 
             <StackPanel Spacing="10">
-              <TextBlock Text="Tags" FontSize="18" FontWeight="SemiBold" />
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="Tags" FontSize="18" FontWeight="SemiBold" />
+                <TextBlock Grid.Column="1"
+                           Text="{Binding TagSummary}"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+              </Grid>
               <Border Padding="14"
                       CornerRadius="6"
                       Background="{DynamicResource ThemeControlLowBrush}">
-                <TextBlock Text="Open an ICC or ICM profile to inspect its tag table."
-                           TextWrapping="Wrap"
-                           Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+                <StackPanel Spacing="6">
+                  <Grid ColumnDefinitions="56,56,*,Auto" ColumnSpacing="10">
+                    <TextBlock Grid.Column="0" Text="Tag" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="1" Text="Type" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="2" Text="Offset" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="3" Text="Size" FontWeight="SemiBold" />
+                  </Grid>
+                  <ItemsControl ItemsSource="{Binding Tags}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="profiles:IccTagInfo">
+                        <Grid ColumnDefinitions="56,56,*,Auto" ColumnSpacing="10" Margin="0,2">
+                          <TextBlock Grid.Column="0" Text="{Binding Signature}" FontFamily="Consolas" />
+                          <TextBlock Grid.Column="1" Text="{Binding TypeSignature}" FontFamily="Consolas" />
+                          <TextBlock Grid.Column="2" Text="{Binding Offset}" />
+                          <TextBlock Grid.Column="3" Text="{Binding Size}" />
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <TextBlock Text="Open an ICC or ICM profile to inspect its tag table."
+                             IsVisible="{Binding !HasTags}"
+                             TextWrapping="Wrap"
+                             Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+                </StackPanel>
               </Border>
             </StackPanel>
           </StackPanel>

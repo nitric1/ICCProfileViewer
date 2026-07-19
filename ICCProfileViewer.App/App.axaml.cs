@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using ICCProfileViewer.App.Services;
 using ICCProfileViewer.App.ViewModels;
 using ICCProfileViewer.App.Views;
+using ICCProfileViewer.Lcms;
 
 namespace ICCProfileViewer.App;
 
@@ -17,7 +18,9 @@ public sealed partial class App : Application
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(new LcmsNativeRuntimeProbe()),
+                DataContext = new MainWindowViewModel(
+                    new LcmsNativeRuntimeProbe(),
+                    new LcmsProfileReader()),
             };
         }
 
