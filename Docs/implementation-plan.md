@@ -692,6 +692,8 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 
 ### 단계 4: 다이어그램 UI
 
+상태: 완료 (2026-07-20). Avalonia `ChromaticityDiagramControl`과 Core 공유 레이아웃·배경 rasterizer를 구현했다. CIE 1931 `xy`/CIE 1976 `u'v'` spectral locus, purple line, 축·격자, 프로필 및 5개 기준 색역 overlay, 선 스타일 범례, 백색점, hover 좌표와 더블클릭 복사, DPI·테마 대응 및 크기·diagram type별 raster cache를 제공한다. 지원하지 않는 gamut은 삼각형 대신 설명을 표시하며 사용자 수동 UI 확인을 마쳤다.
+
 - `xy` 다이어그램
 - `u'v'` 다이어그램
 - overlay, 범례, tooltip

@@ -65,12 +65,49 @@ public sealed class MainWindowViewModelTests
         Assert.AreEqual("Perceptual", viewModel.RenderingIntent);
         Assert.AreEqual("Example profile", viewModel.Description);
         Assert.AreEqual("Matrix/TRC", viewModel.ProfileStructure);
+        Assert.IsFalse(viewModel.HasProfileGamut);
+        StringAssert.Contains(viewModel.GamutStatusMessage, "does not provide");
         Assert.AreEqual("1 tag", viewModel.TagSummary);
         Assert.HasCount(1, viewModel.Tags);
         Assert.IsFalse(viewModel.HasDiagnosticMessage);
         Assert.IsTrue(viewModel.CanOpenProfile);
         StringAssert.Contains(viewModel.DiagnosticsText, "Profile.Loaded");
         StringAssert.Contains(viewModel.DiagnosticsText, "sample.icc");
+    }
+
+    [TestMethod]
+    public async Task LoadProfileAsync_WithSupportedGamut_ExposesDiagramBoundary()
+    {
+        var gamut = new GamutBoundary(
+            ChromaticityPoint.FromXyz(
+                "Red",
+                ChromaticityPointRole.RedPrimary,
+                new XyzColor(0.4124, 0.2126, 0.0193)),
+            ChromaticityPoint.FromXyz(
+                "Green",
+                ChromaticityPointRole.GreenPrimary,
+                new XyzColor(0.3576, 0.7152, 0.1192)),
+            ChromaticityPoint.FromXyz(
+                "Blue",
+                ChromaticityPointRole.BluePrimary,
+                new XyzColor(0.1805, 0.0722, 0.9505)),
+            ChromaticityPoint.FromXyz(
+                "White",
+                ChromaticityPointRole.WhitePoint,
+                new XyzColor(0.9505, 1, 1.0888)),
+            GamutCalculationMethod.MatrixTrcDeviceTransform,
+            GamutBoundaryAccuracy.Exact,
+            "Test fixture");
+        var profile = CreateProfile("matrix.icc") with { Gamut = gamut };
+        using var viewModel = CreateViewModel(
+            new NativeRuntimeStatus(true, "ready", null),
+            (_, _, _) => Task.FromResult(profile));
+
+        await viewModel.LoadProfileAsync(new StubProfileFileSource("matrix.icc"));
+
+        Assert.IsTrue(viewModel.HasProfileGamut);
+        Assert.AreSame(gamut, viewModel.ProfileGamut);
+        StringAssert.Contains(viewModel.GamutStatusMessage, "thick solid line");
     }
 
     [TestMethod]

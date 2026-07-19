@@ -131,6 +131,17 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         ? EmptyValue
         : profile.IsMatrixShaper ? "Matrix/TRC" : "LUT or other";
 
+    public GamutBoundary? ProfileGamut => profile?.Gamut;
+
+    public bool HasProfileGamut => ProfileGamut is not null;
+
+    public string GamutStatusMessage => profile switch
+    {
+        null => "Open an RGB ICC or ICM profile to display its gamut.",
+        { Gamut: not null } => "Profile gamut is shown as the thick solid line.",
+        _ => "This profile does not provide a supported RGB Matrix/TRC gamut. Metadata remains available.",
+    };
+
     public IReadOnlyList<ProfileMetadataRow> SummaryRows => new[]
     {
         new ProfileMetadataRow("File size", ProfileSize),
@@ -409,6 +420,9 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(WhitePoint));
         OnPropertyChanged(nameof(BlackPoint));
         OnPropertyChanged(nameof(ProfileStructure));
+        OnPropertyChanged(nameof(ProfileGamut));
+        OnPropertyChanged(nameof(HasProfileGamut));
+        OnPropertyChanged(nameof(GamutStatusMessage));
         OnPropertyChanged(nameof(SummaryRows));
         OnPropertyChanged(nameof(TagSummary));
         OnPropertyChanged(nameof(Tags));

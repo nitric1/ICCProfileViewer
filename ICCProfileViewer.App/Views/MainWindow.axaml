@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:ICCProfileViewer.App.ViewModels"
         xmlns:profiles="using:ICCProfileViewer.Core.Profiles"
+        xmlns:controls="using:ICCProfileViewer.App.Controls"
         x:Class="ICCProfileViewer.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="{Binding WindowTitle}"
@@ -113,10 +114,16 @@
                     CornerRadius="8"
                     BorderBrush="{DynamicResource ThemeBorderMidBrush}"
                     BorderThickness="1">
-              <TextBlock Text="CIE 1931 xy chromaticity diagram"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"
-                         Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+              <controls:ChromaticityDiagramControl
+                  DiagramType="Cie1931Xy"
+                  ProfileGamut="{Binding ProfileGamut}"
+                  ShowSrgb="{Binding ShowSrgb}"
+                  ShowDisplayP3="{Binding ShowDisplayP3}"
+                  ShowDciP3="{Binding ShowDciP3}"
+                  ShowAdobeRgb="{Binding ShowAdobeRgb}"
+                  ShowBt2020="{Binding ShowBt2020}"
+                  ShowWhitePoints="{Binding ShowWhitePoints}"
+                  MinHeight="400" />
             </Border>
           </TabItem>
           <TabItem Header="CIE 1976 u'v'">
@@ -124,24 +131,57 @@
                     CornerRadius="8"
                     BorderBrush="{DynamicResource ThemeBorderMidBrush}"
                     BorderThickness="1">
-              <TextBlock Text="CIE 1976 u'v' chromaticity diagram"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"
-                         Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+              <controls:ChromaticityDiagramControl
+                  DiagramType="Cie1976UvPrime"
+                  ProfileGamut="{Binding ProfileGamut}"
+                  ShowSrgb="{Binding ShowSrgb}"
+                  ShowDisplayP3="{Binding ShowDisplayP3}"
+                  ShowDciP3="{Binding ShowDciP3}"
+                  ShowAdobeRgb="{Binding ShowAdobeRgb}"
+                  ShowBt2020="{Binding ShowBt2020}"
+                  ShowWhitePoints="{Binding ShowWhitePoints}"
+                  MinHeight="400" />
             </Border>
           </TabItem>
         </TabControl>
 
         <StackPanel Grid.Row="1" Margin="0,16,0,0" Spacing="8">
-          <TextBlock Text="Reference gamuts" FontWeight="SemiBold" />
+          <Grid ColumnDefinitions="Auto,*">
+            <TextBlock Grid.Column="0" Text="Reference gamuts" FontWeight="SemiBold" />
+            <TextBlock Grid.Column="1"
+                       Text="{Binding GamutStatusMessage}"
+                       Margin="18,0,0,0"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                       FontSize="12" />
+          </Grid>
           <WrapPanel Orientation="Horizontal">
-            <CheckBox Content="sRGB" IsChecked="{Binding ShowSrgb}" Margin="0,0,16,0" />
-            <CheckBox Content="Display P3" IsChecked="{Binding ShowDisplayP3}" Margin="0,0,16,0" />
-            <CheckBox Content="DCI-P3 (DCI white)" IsChecked="{Binding ShowDciP3}" Margin="0,0,16,0" />
-            <CheckBox Content="Adobe RGB (1998)" IsChecked="{Binding ShowAdobeRgb}" Margin="0,0,16,0" />
-            <CheckBox Content="BT.2020" IsChecked="{Binding ShowBt2020}" Margin="0,0,16,0" />
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+              <Path Data="M 0,5 L 28,5" Stroke="#0078D4" StrokeThickness="2" StrokeDashArray="8,4" Width="30" Height="10" />
+              <CheckBox Content="sRGB" IsChecked="{Binding ShowSrgb}" Margin="4,0,0,0" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+              <Path Data="M 0,5 L 28,5" Stroke="#00A36C" StrokeThickness="2" StrokeDashArray="3,3" Width="30" Height="10" />
+              <CheckBox Content="Display P3" IsChecked="{Binding ShowDisplayP3}" Margin="4,0,0,0" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+              <Path Data="M 0,5 L 28,5" Stroke="#E67E22" StrokeThickness="2" StrokeDashArray="10,3,2,3" Width="30" Height="10" />
+              <CheckBox Content="DCI-P3 (DCI white)" IsChecked="{Binding ShowDciP3}" Margin="4,0,0,0" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+              <Path Data="M 0,5 L 28,5" Stroke="#8E44AD" StrokeThickness="2" StrokeDashArray="2,3" Width="30" Height="10" />
+              <CheckBox Content="Adobe RGB (1998)" IsChecked="{Binding ShowAdobeRgb}" Margin="4,0,0,0" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+              <Path Data="M 0,5 L 28,5" Stroke="#D81B60" StrokeThickness="2" StrokeDashArray="12,4" Width="30" Height="10" />
+              <CheckBox Content="BT.2020" IsChecked="{Binding ShowBt2020}" Margin="4,0,0,0" />
+            </StackPanel>
             <CheckBox Content="White points" IsChecked="{Binding ShowWhitePoints}" />
           </WrapPanel>
+          <TextBlock Text="The chromaticity background is an on-screen visualization, not a color-accurate reproduction. Hover for coordinates; double-click the diagram to copy."
+                     TextWrapping="Wrap"
+                     Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                     FontSize="11" />
         </StackPanel>
       </Grid>
     </Grid>
