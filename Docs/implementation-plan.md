@@ -18,7 +18,7 @@
 | LittleCMS 소스 | `mm2/Little-CMS` Git submodule | `lcms2.19.1` (`21c582a594fe5279f90c0b93437c398f93bf62b0`)에 고정 |
 | 네이티브 준비 | MVP는 Windows 수동 script | `.slnx` build에서는 LittleCMS를 빌드하지 않으며 macOS·Linux 설치 경로는 MVP 이후 마련 |
 | 다이어그램 | Avalonia 커스텀 컨트롤 | 벡터 경계선과 캐시된 래스터 배경을 조합 |
-| 테스트 | xUnit | 순수 계산 단위 테스트와 네이티브 통합 테스트 분리 |
+| 테스트 | MSTest | 순수 계산 단위 테스트와 네이티브 통합 테스트 분리 |
 
 Avalonia 12는 .NET 10을 권장 대상으로 지원한다. `lcmsNET` 1.2.1은 `net8.0` 및 `netstandard2.0` 자산을 제공하므로 `net10.0`에서 참조할 수 있다.
 
@@ -196,6 +196,16 @@ lcmsNET upstream 문서는 LittleCMS 2.9 이상을 실행 요구사항으로 명
 6. 오류 콜백의 수명과 스레드 동작이 안전한가.
 7. 프로필/transform 객체의 `Dispose`가 네이티브 핸들을 정확히 해제하는가.
 8. Windows에서 네이티브 라이브러리 이름과 경로를 바인딩이 어떻게 탐색하는가.
+
+현재까지 확인한 결과는 다음과 같다.
+
+- `lcmsNET` 1.2.1은 `net10.0` 프로젝트에서 restore와 build가 가능하다.
+- `Profile.Open(byte[])`를 제공하므로 ICC profile stream을 임시 파일 없이 메모리에서 열 수 있다.
+- `Profile`에서 ICC version, profile class, data color space, PCS, rendering intent, 생성 시각, 설명과 기본 tag count를 읽을 수 있다.
+- `lcmsNET`의 native import 이름은 `lcms2`이며, Windows x64에서는 `NativeLibrary.SetDllImportResolver`로 명시 경로와 앱 로컬 `lcms2.dll`을 우선 탐색할 수 있다.
+- submodule의 v2/v4 test profile을 MSTest 통합 테스트 fixture로 사용하고, 수동 빌드한 Little CMS 2.19 Windows x64 artifact로 검증한다.
+
+태그별 typed read, RGB-to-XYZ transform, 오류 callback 수명, 반복 dispose 검증은 후속 단계 0 작업으로 남긴다.
 
 스파이크 결과 `lcmsNET`에 필요한 API가 일부 없을 경우 전체 바인딩을 교체하지 않고 다음 순서로 대응한다.
 

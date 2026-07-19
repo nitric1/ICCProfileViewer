@@ -93,7 +93,13 @@ A source build is optional. A compatible `lcms2.dll` prepared separately can be 
 2. `lcms2.dll` in the application executable directory
 3. The default Windows dynamic-library search paths
 
-The exact import name and resolver behavior will be verified during the `lcmsNET` integration phase.
+`lcmsNET` 1.2.1 imports the library as `lcms2`. The application registers a `NativeLibrary.SetDllImportResolver` for the `lcmsNET` assembly and applies the lookup order above before allowing the runtime to use its default search paths.
+
+The Windows integration tests set `ICC_PROFILE_VIEWER_LCMS_PATH` to `Artifacts/native/win-x64/Release/lcms2.dll`. Build that artifact before running:
+
+```powershell
+dotnet test ICCProfileViewer.slnx -c Debug
+```
 
 ## 3. macOS and Linux
 

@@ -16,4 +16,14 @@ On Windows x64, build the native library from a Visual Studio Developer Command 
 .\build-lcms.cmd Release x64
 ```
 
+Restore, build, and run the MSTest suite:
+
+```powershell
+dotnet restore ICCProfileViewer.slnx
+dotnet build ICCProfileViewer.slnx -c Debug --no-restore
+dotnet test ICCProfileViewer.slnx -c Debug --no-build
+```
+
+The Little-CMS integration tests use `Artifacts/native/win-x64/Release/lcms2.dll`, so run the native build command before the test command.
+
 See [Docs/native-build.md](Docs/native-build.md) for prerequisites, outputs, troubleshooting, and the post-MVP macOS/Linux policy.

@@ -1,3 +1,5 @@
 <Solution>
   <Project Path="ICCProfileViewer.Core/ICCProfileViewer.Core.csproj" />
+  <Project Path="ICCProfileViewer.Lcms/ICCProfileViewer.Lcms.csproj" />
+  <Project Path="ICCProfileViewer.Lcms.IntegrationTests/ICCProfileViewer.Lcms.IntegrationTests.csproj" />
 </Solution>
