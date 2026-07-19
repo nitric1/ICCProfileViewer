@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using ICCProfileViewer.App.Diagnostics;
 using ICCProfileViewer.App.Services;
 using ICCProfileViewer.Core.Colorimetry;
 using ICCProfileViewer.Core.Profiles;
@@ -14,6 +17,7 @@ namespace ICCProfileViewer.App.ViewModels;
 public sealed class MainWindowViewModel : ViewModelBase, IDisposable
 {
     private readonly IIccProfileReader profileReader;
+    private readonly IApplicationDiagnosticLog diagnosticLog;
     private CancellationTokenSource? loadCancellation;
     private ApplicationViewState state;
     private IccProfileInfo? profile;
@@ -32,9 +36,12 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
 
     public MainWindowViewModel(
         INativeRuntimeProbe nativeRuntimeProbe,
-        IIccProfileReader profileReader)
+        IIccProfileReader profileReader,
+        IApplicationDiagnosticLog diagnosticLog)
     {
         this.profileReader = profileReader;
+        this.diagnosticLog = diagnosticLog;
+        diagnosticLog.Changed += DiagnosticLogChanged;
         var runtimeStatus = nativeRuntimeProbe.Probe();
         nativeRuntimeSummary = runtimeStatus.Summary;
         diagnosticMessage = runtimeStatus.DiagnosticMessage;
@@ -45,6 +52,19 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         statusMessage = runtimeStatus.IsAvailable
             ? "Ready. Open an ICC or ICM profile."
             : "ICC profile loading is disabled until Little CMS is available.";
+
+        diagnosticLog.Write(
+            DiagnosticLogLevel.Information,
+            "Application.Started",
+            $"{RuntimeInformation.FrameworkDescription}; {RuntimeInformation.OSDescription}; " +
+            $"RID {RuntimeInformation.RuntimeIdentifier}; " +
+            $"process architecture {RuntimeInformation.ProcessArchitecture}.");
+        diagnosticLog.Write(
+            runtimeStatus.IsAvailable ? DiagnosticLogLevel.Information : DiagnosticLogLevel.Error,
+            runtimeStatus.IsAvailable ? "LittleCMS.Ready" : "LittleCMS.Unavailable",
+            runtimeStatus.DiagnosticMessage is null
+                ? runtimeStatus.Summary
+                : $"{runtimeStatus.Summary} {runtimeStatus.DiagnosticMessage}");
     }
 
     public string WindowTitle => "ICC Profile Viewer";
@@ -66,6 +86,10 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     public bool HasDiagnosticMessage => DiagnosticMessage is not null;
 
     public string StatusMessage => statusMessage;
+
+    public string DiagnosticsHeader => $"Diagnostics ({diagnosticLog.Count})";
+
+    public string DiagnosticsText => diagnosticLog.CreateReport();
 
     public bool IsDropTargetVisible => isDropTargetVisible;
 
@@ -149,6 +173,11 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         loadCancellation = cancellation;
         previousCancellation?.Cancel();
 
+        diagnosticLog.Write(
+            DiagnosticLogLevel.Information,
+            "Profile.LoadStarted",
+            $"Loading '{source.DisplayName}'.");
+
         ClearProfile();
         SetDiagnosticMessage(null);
         SetStatusMessage($"Loading {source.DisplayName}...");
@@ -171,12 +200,28 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
             SetProfile(loadedProfile);
             SetStatusMessage($"Metadata loaded successfully ({loadedProfile.TagCount} tags).");
             SetState(ApplicationViewState.Loaded);
+            diagnosticLog.Write(
+                DiagnosticLogLevel.Information,
+                "Profile.Loaded",
+                $"Loaded '{loadedProfile.DisplayName}': ICC {ProfileVersion}, " +
+                $"{loadedProfile.ProfileClass}, {loadedProfile.DataColorSpace}/" +
+                $"{loadedProfile.ProfileConnectionSpace}, {loadedProfile.SizeInBytes} bytes, " +
+                $"{loadedProfile.TagCount} tags.");
         }
         catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
         {
+            diagnosticLog.Write(
+                DiagnosticLogLevel.Information,
+                "Profile.LoadCanceled",
+                $"Canceled loading '{source.DisplayName}'.");
         }
         catch (LcmsNativeLibraryException exception)
         {
+            diagnosticLog.Write(
+                DiagnosticLogLevel.Error,
+                "LittleCMS.LoadFailed",
+                $"Little CMS became unavailable while loading '{source.DisplayName}'.",
+                exception);
             if (!ReferenceEquals(loadCancellation, cancellation))
             {
                 return;
@@ -190,6 +235,11 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         }
         catch (LcmsProfileReadException exception)
         {
+            diagnosticLog.Write(
+                DiagnosticLogLevel.Warning,
+                "Profile.Invalid",
+                CreateProfileReadLogMessage(exception),
+                exception);
             if (!ReferenceEquals(loadCancellation, cancellation))
             {
                 return;
@@ -201,6 +251,11 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         }
         catch (Exception exception)
         {
+            diagnosticLog.Write(
+                DiagnosticLogLevel.Error,
+                "Profile.LoadFailed",
+                $"Unexpected failure while loading '{source.DisplayName}'.",
+                exception);
             if (!ReferenceEquals(loadCancellation, cancellation))
             {
                 return;
@@ -260,6 +315,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
 
     public void Dispose()
     {
+        diagnosticLog.Changed -= DiagnosticLogChanged;
         loadCancellation?.Cancel();
         loadCancellation = null;
     }
@@ -267,6 +323,11 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     public void ReportFilePickerError(Exception exception)
     {
         ArgumentNullException.ThrowIfNull(exception);
+        diagnosticLog.Write(
+            DiagnosticLogLevel.Error,
+            "FilePicker.Failed",
+            "The system file picker failed.",
+            exception);
         SetDiagnosticMessage(exception.Message);
         SetStatusMessage("Could not open the system file picker.");
         SetState(ApplicationViewState.UnexpectedError);
@@ -313,6 +374,19 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         return string.IsNullOrWhiteSpace(details)
             ? exception.Message
             : $"{exception.Message} {details}";
+    }
+
+    private static string CreateProfileReadLogMessage(LcmsProfileReadException exception)
+    {
+        if (exception.NativeErrors.Count == 0)
+        {
+            return $"'{exception.DisplayName}' failed ICC validation without a Little CMS error code.";
+        }
+
+        var nativeErrors = string.Join(
+            "; ",
+            exception.NativeErrors.Select(error => $"{error.Code}: {error.Message}"));
+        return $"'{exception.DisplayName}' failed ICC validation. Little CMS errors: {nativeErrors}";
     }
 
     private void ClearProfile() => SetProfile(null);
@@ -374,4 +448,10 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
 
     private void SetStatusMessage(string value) =>
         SetProperty(ref statusMessage, value, nameof(StatusMessage));
+
+    private void DiagnosticLogChanged(object? sender, EventArgs eventArgs)
+    {
+        OnPropertyChanged(nameof(DiagnosticsHeader));
+        OnPropertyChanged(nameof(DiagnosticsText));
+    }
 }

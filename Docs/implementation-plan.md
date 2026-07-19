@@ -521,6 +521,8 @@ ViewModel은 다음 상태를 명시적으로 갖는다.
 
 특히 네이티브 라이브러리 누락은 일반적인 “파일을 열 수 없음”과 구분해 버전, RID, 탐색 위치를 진단 로그에 남긴다.
 
+진단 로그는 MVP에서 최대 200개 항목을 보관하는 메모리 ring buffer로 구현한다. UTC timestamp, level, event name, 메시지와 예외 세부 정보를 기록하며 자동으로 디스크에 쓰지 않는다. 사용자는 앱 하단의 접이식 Diagnostics 패널에서 로그를 선택해 복사할 수 있다.
+
 LittleCMS가 설치되지 않았더라도 프로세스가 시작 단계에서 종료되어서는 안 된다. `NativeLibraryBootstrapper.TryInitialize` 형태로 native dependency를 먼저 검사하고, 실패하면 프로필 열기 기능을 비활성화한 상태에서 `Docs/native-build.md`에 대응하는 설치·앱 로컬 복사 안내를 표시한다.
 
 ## 13. 테스트 전략
@@ -646,7 +648,7 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 
 ### 단계 2: 프로필 메타데이터
 
-상태: 진행 중. Storage Provider 기반 `.icc`/`.icm` 파일 선택과 단일 파일 drag-and-drop, 취소 가능한 비동기 파싱, v2/v4 메타데이터와 tag 목록 표시, 손상된 프로필 및 native dependency 오류 상태를 구현했다. 별도 진단 로그는 남아 있다.
+상태: 완료 (2026-07-20). Storage Provider 기반 `.icc`/`.icm` 파일 선택과 단일 파일 drag-and-drop, 취소 가능한 비동기 파싱, v2/v4 메타데이터와 tag 목록 표시, 손상된 프로필 및 native dependency 오류 상태, 복사 가능한 메모리 진단 로그를 구현했다.
 
 - 파일 선택 및 drag-and-drop
 - 비동기 파싱과 취소

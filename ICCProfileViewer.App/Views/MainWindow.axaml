@@ -179,6 +179,24 @@
                    TextWrapping="Wrap"
                    Foreground="{DynamicResource SystemErrorTextColor}"
                    FontSize="12" />
+        <Expander Header="{Binding DiagnosticsHeader}"
+                  Margin="0,6,0,0">
+          <StackPanel Spacing="6">
+            <TextBlock Text="Select log text and press Ctrl+C to copy."
+                       Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                       FontSize="11" />
+            <TextBox Text="{Binding DiagnosticsText, Mode=OneWay}"
+                     IsReadOnly="True"
+                     AcceptsReturn="True"
+                     TextWrapping="NoWrap"
+                     FontFamily="Consolas"
+                     FontSize="11"
+                     MinHeight="100"
+                     MaxHeight="200"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto" />
+          </StackPanel>
+        </Expander>
       </StackPanel>
     </Border>
   </Grid>

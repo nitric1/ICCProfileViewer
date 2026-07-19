@@ -37,6 +37,8 @@ When `ICCProfileViewer.App` is selected as the Visual Studio startup project, ch
 
 Use **Open Profile** to select an `.icc` or `.icm` file, or drag one profile file onto the application window. The application reads ICC v2/v4 metadata and displays the profile summary and tag table without requiring a temporary file. It remains open when Little-CMS is unavailable and displays a native-dependency diagnostic instead.
 
+Expand **Diagnostics** at the bottom of the window to inspect and copy the bounded in-memory log. It records the runtime environment, resolved Little-CMS version and location, profile load results, cancellations, and exception details without writing log files to disk.
+
 Chromaticity calculation and diagram rendering are subsequent implementation steps.
 
 See [Docs/native-build.md](Docs/native-build.md) for prerequisites, outputs, troubleshooting, and the post-MVP macOS/Linux policy.

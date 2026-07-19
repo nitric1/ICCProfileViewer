@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using ICCProfileViewer.App.Diagnostics;
 using ICCProfileViewer.App.Services;
 using ICCProfileViewer.App.ViewModels;
 using ICCProfileViewer.Core.Colorimetry;
@@ -25,6 +26,8 @@ public sealed class MainWindowViewModelTests
         Assert.IsTrue(viewModel.CanOpenProfile);
         Assert.AreEqual("Little CMS 2.19 ready", viewModel.NativeRuntimeSummary);
         Assert.IsFalse(viewModel.HasDiagnosticMessage);
+        StringAssert.Contains(viewModel.DiagnosticsText, "Application.Started");
+        StringAssert.Contains(viewModel.DiagnosticsText, "LittleCMS.Ready");
         Assert.IsTrue(viewModel.ShowSrgb);
         Assert.IsTrue(viewModel.ShowWhitePoints);
     }
@@ -66,6 +69,8 @@ public sealed class MainWindowViewModelTests
         Assert.HasCount(1, viewModel.Tags);
         Assert.IsFalse(viewModel.HasDiagnosticMessage);
         Assert.IsTrue(viewModel.CanOpenProfile);
+        StringAssert.Contains(viewModel.DiagnosticsText, "Profile.Loaded");
+        StringAssert.Contains(viewModel.DiagnosticsText, "sample.icc");
     }
 
     [TestMethod]
@@ -85,6 +90,7 @@ public sealed class MainWindowViewModelTests
         StringAssert.Contains(viewModel.StatusMessage, "not a valid");
         StringAssert.Contains(viewModel.DiagnosticMessage, "ICC signature is missing");
         Assert.AreEqual("No profile loaded", viewModel.ProfileName);
+        StringAssert.Contains(viewModel.DiagnosticsText, "Profile.Invalid");
     }
 
     [TestMethod]
@@ -206,7 +212,8 @@ public sealed class MainWindowViewModelTests
         return new MainWindowViewModel(
             new StubProbe(status),
             new StubProfileReader(readAsync ?? ((_, displayName, _) =>
-                Task.FromResult(CreateProfile(displayName)))));
+                Task.FromResult(CreateProfile(displayName)))),
+            new ApplicationDiagnosticLog());
     }
 
     private static IccProfileInfo CreateProfile(string displayName)

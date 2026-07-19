@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using ICCProfileViewer.App.Diagnostics;
 using ICCProfileViewer.App.Services;
 using ICCProfileViewer.App.ViewModels;
 using ICCProfileViewer.App.Views;
@@ -16,11 +17,13 @@ public sealed partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            var diagnosticLog = new ApplicationDiagnosticLog();
             desktop.MainWindow = new MainWindow
             {
                 DataContext = new MainWindowViewModel(
                     new LcmsNativeRuntimeProbe(),
-                    new LcmsProfileReader()),
+                    new LcmsProfileReader(),
+                    diagnosticLog),
             };
         }
 
