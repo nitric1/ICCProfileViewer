@@ -1,0 +1,128 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ICCProfileViewer.App.ViewModels"
+        x:Class="ICCProfileViewer.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="{Binding WindowTitle}"
+        Width="1280"
+        Height="800"
+        MinWidth="960"
+        MinHeight="640"
+        WindowStartupLocation="CenterScreen">
+  <Grid RowDefinitions="Auto,*,Auto">
+    <Border Grid.Row="0"
+            Padding="16,12"
+            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+            BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="Auto,16,*,Auto" VerticalAlignment="Center">
+        <Button Grid.Column="0"
+                Content="Open Profile"
+                IsEnabled="False"
+                ToolTip.Tip="Profile selection will be implemented in the next step." />
+        <StackPanel Grid.Column="2" Spacing="2">
+          <TextBlock Text="{Binding ProfileName}" FontWeight="SemiBold" />
+          <TextBlock Text="{Binding StatusMessage}"
+                     Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                     FontSize="12" />
+        </StackPanel>
+        <Border Grid.Column="3"
+                Padding="10,5"
+                CornerRadius="12"
+                Background="{DynamicResource ThemeControlLowBrush}">
+          <TextBlock Text="{Binding StateName}" FontSize="12" />
+        </Border>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1" ColumnDefinitions="320,*">
+      <Border Grid.Column="0"
+              Padding="18"
+              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+              BorderThickness="0,0,1,0">
+        <ScrollViewer>
+          <StackPanel Spacing="20">
+            <StackPanel Spacing="10">
+              <TextBlock Text="Profile Summary" FontSize="18" FontWeight="SemiBold" />
+              <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="8">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Version" Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding EmptyValue}" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Profile class" Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding EmptyValue}" />
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Color space" Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding EmptyValue}" />
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="PCS" Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding EmptyValue}" />
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Description" Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding EmptyValue}" TextWrapping="Wrap" />
+              </Grid>
+            </StackPanel>
+
+            <StackPanel Spacing="10">
+              <TextBlock Text="Tags" FontSize="18" FontWeight="SemiBold" />
+              <Border Padding="14"
+                      CornerRadius="6"
+                      Background="{DynamicResource ThemeControlLowBrush}">
+                <TextBlock Text="Open an ICC or ICM profile to inspect its tag table."
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+              </Border>
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+
+      <Grid Grid.Column="1" RowDefinitions="*,Auto" Margin="18">
+        <TabControl Grid.Row="0">
+          <TabItem Header="CIE 1931 xy">
+            <Border Margin="0,12,0,0"
+                    CornerRadius="8"
+                    BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                    BorderThickness="1">
+              <TextBlock Text="CIE 1931 xy chromaticity diagram"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+            </Border>
+          </TabItem>
+          <TabItem Header="CIE 1976 u'v'">
+            <Border Margin="0,12,0,0"
+                    CornerRadius="8"
+                    BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                    BorderThickness="1">
+              <TextBlock Text="CIE 1976 u'v' chromaticity diagram"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+            </Border>
+          </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Row="1" Margin="0,16,0,0" Spacing="8">
+          <TextBlock Text="Reference gamuts" FontWeight="SemiBold" />
+          <WrapPanel Orientation="Horizontal">
+            <CheckBox Content="sRGB" IsChecked="{Binding ShowSrgb}" Margin="0,0,16,0" />
+            <CheckBox Content="Display P3" IsChecked="{Binding ShowDisplayP3}" Margin="0,0,16,0" />
+            <CheckBox Content="DCI-P3 (DCI white)" IsChecked="{Binding ShowDciP3}" Margin="0,0,16,0" />
+            <CheckBox Content="Adobe RGB (1998)" IsChecked="{Binding ShowAdobeRgb}" Margin="0,0,16,0" />
+            <CheckBox Content="BT.2020" IsChecked="{Binding ShowBt2020}" Margin="0,0,16,0" />
+            <CheckBox Content="White points" IsChecked="{Binding ShowWhitePoints}" />
+          </WrapPanel>
+        </StackPanel>
+      </Grid>
+    </Grid>
+
+    <Border Grid.Row="2"
+            Padding="14,9"
+            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+            BorderThickness="0,1,0,0">
+      <StackPanel Spacing="3">
+        <TextBlock Text="{Binding NativeRuntimeSummary}" FontSize="12" />
+        <TextBlock Text="{Binding DiagnosticMessage}"
+                   IsVisible="{Binding HasDiagnosticMessage}"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource SystemErrorTextColor}"
+                   FontSize="12" />
+      </StackPanel>
+    </Border>
+  </Grid>
+</Window>

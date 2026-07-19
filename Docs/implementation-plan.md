@@ -11,7 +11,7 @@
 | 구분 | 선택 | 비고 |
 |---|---|---|
 | 언어/런타임 | C# / .NET 10 LTS | 모든 프로젝트에서 nullable 활성화 |
-| UI | Avalonia 12.x | MVP는 Windows x64, 이후 Windows ARM64·macOS·Linux로 확장 가능한 단일 UI 코드베이스 |
+| UI | Avalonia 12.1.0 | MVP는 Windows x64, 이후 Windows ARM64·macOS·Linux로 확장 가능한 단일 UI 코드베이스 |
 | UI 패턴 | MVVM | 화면 상태와 ICC/색도 계산 로직 분리 |
 | ICC 엔진 | LittleCMS 2 | ICC v2/v4 처리와 색 변환 담당 |
 | .NET 바인딩 | `lcmsNET` 1.2.1 | 구현 시작 시 최신 호환 버전을 다시 확인하고 고정 |
@@ -633,6 +633,8 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 완료 조건: Windows x64의 시스템 설치 및 수동 source build 방법, native 탐색 순서와 필요한 API 사용법이 문서화되고 Windows 통합 테스트가 통과한다.
 
 ### 단계 1: 솔루션 골격
+
+상태: 진행 중. Avalonia 12.1.0 App과 기본 MVVM 화면, native dependency 상태 probe, App ViewModel MSTest까지 구현했다. 기본 CI build/test 구성은 남아 있다.
 
 - Avalonia App 프로젝트 생성
 - Lcms 어댑터와 테스트 프로젝트 생성
