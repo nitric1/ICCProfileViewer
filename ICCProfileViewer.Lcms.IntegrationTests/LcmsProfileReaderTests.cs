@@ -70,6 +70,23 @@ public sealed class LcmsProfileReaderTests
     }
 
     [TestMethod]
+    public async Task ReadAsync_AllowsNullPaddingAfterDeclaredProfileSize()
+    {
+        var profileBytes = await File.ReadAllBytesAsync(TestRepository.ProfilePath("test5.icc"));
+        var paddedProfileBytes = new byte[profileBytes.Length + 3];
+        profileBytes.CopyTo(paddedProfileBytes, 0);
+        await using var stream = new MemoryStream(paddedProfileBytes, writable: false);
+
+        var profile = await reader.ReadAsync(stream, "padded-test5.icc", CancellationToken.None);
+
+        Assert.AreEqual("padded-test5.icc", profile.DisplayName);
+        Assert.AreEqual(paddedProfileBytes.Length, profile.SizeInBytes);
+        Assert.AreEqual(2.1, profile.Version, 0.001);
+        Assert.AreEqual("RGB", profile.DataColorSpace);
+        Assert.AreEqual(17, profile.TagCount);
+    }
+
+    [TestMethod]
     public async Task ReadAsync_WrapsInvalidProfileError()
     {
         await using var stream = File.OpenRead(TestRepository.ProfilePath("bad.icc"));

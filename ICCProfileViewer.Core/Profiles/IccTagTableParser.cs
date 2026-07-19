@@ -24,11 +24,22 @@ public static class IccTagTableParser
         }
 
         var declaredSize = ReadUInt32(profileData, 0);
-        if (declaredSize != profileData.Length)
+        if (declaredSize < HeaderSizeInBytes + TagCountSizeInBytes)
+        {
+            throw new InvalidDataException(
+                $"The ICC profile declares only {declaredSize} bytes, which is too small for a header and tag table.");
+        }
+
+        if (declaredSize > profileData.Length)
         {
             throw new InvalidDataException(
                 $"The ICC profile declares {declaredSize} bytes but contains {profileData.Length} bytes.");
         }
+
+        // Some installed profiles contain non-profile padding after the byte count declared
+        // by the ICC header. Keep the declared size as the validation boundary so tags cannot
+        // address those trailing bytes.
+        profileData = profileData[..checked((int)declaredSize)];
 
         if (ReadUInt32(profileData, ProfileSignatureOffset) != ProfileSignature)
         {

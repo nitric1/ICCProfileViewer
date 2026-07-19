@@ -36,7 +36,7 @@ public sealed class IccTagTableParserTests
     }
 
     [TestMethod]
-    public void Parse_RejectsDeclaredSizeMismatch()
+    public void Parse_RejectsDeclaredSizeLargerThanAvailableData()
     {
         var profile = CreateProfile();
         WriteUInt32(profile, 0, (uint)profile.Length + 4);
@@ -45,6 +45,44 @@ public sealed class IccTagTableParserTests
             IccTagTableParser.Parse(profile));
 
         StringAssert.Contains(exception.Message, "declares");
+    }
+
+    [TestMethod]
+    public void Parse_AllowsBytesAfterDeclaredProfileSize()
+    {
+        var profile = CreateProfile(extraBytes: 3);
+        profile[^1] = 0xA5;
+
+        var tags = IccTagTableParser.Parse(profile);
+
+        Assert.HasCount(1, tags);
+        Assert.AreEqual("wtpt", tags[0].Signature);
+    }
+
+    [TestMethod]
+    public void Parse_RejectsTagThatOnlyFitsInTrailingBytes()
+    {
+        var profile = CreateProfile(extraBytes: 8);
+        WriteUInt32(profile, 136, 160);
+        WriteUInt32(profile, 140, 8);
+        WriteSignature(profile, 160, "XYZ ");
+
+        var exception = Assert.ThrowsExactly<InvalidDataException>(() =>
+            IccTagTableParser.Parse(profile));
+
+        StringAssert.Contains(exception.Message, "past the end");
+    }
+
+    [TestMethod]
+    public void Parse_RejectsDeclaredSizeTooSmallForTagTable()
+    {
+        var profile = CreateProfile();
+        WriteUInt32(profile, 0, 128);
+
+        var exception = Assert.ThrowsExactly<InvalidDataException>(() =>
+            IccTagTableParser.Parse(profile));
+
+        StringAssert.Contains(exception.Message, "too small");
     }
 
     [TestMethod]
@@ -59,10 +97,11 @@ public sealed class IccTagTableParserTests
         StringAssert.Contains(exception.Message, "past the end");
     }
 
-    private static byte[] CreateProfile()
+    private static byte[] CreateProfile(int extraBytes = 0)
     {
-        var profile = new byte[160];
-        WriteUInt32(profile, 0, (uint)profile.Length);
+        const int declaredSize = 160;
+        var profile = new byte[declaredSize + extraBytes];
+        WriteUInt32(profile, 0, declaredSize);
         WriteSignature(profile, 36, "acsp");
         WriteUInt32(profile, 128, 1);
         WriteSignature(profile, 132, "wtpt");
