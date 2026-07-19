@@ -660,7 +660,7 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 
 ### 단계 1: 솔루션 골격
 
-상태: 진행 중. Avalonia 12.1.0 App과 기본 MVVM 화면, native dependency 상태 probe, App ViewModel MSTest까지 구현했다. 기본 CI build/test 구성은 남아 있다.
+상태: 완료 (2026-07-20). Avalonia 12.1.0 App과 기본 MVVM 화면, native dependency 상태 probe, App ViewModel MSTest를 구현했다. `.github/workflows/ci.yml`은 Windows 2025/Visual Studio 2026 x64 runner에서 submodule을 checkout하고 .NET 10을 설정한 뒤 `build-lcms.cmd Release x64`와 전체 Release MSTest를 실행한다.
 
 - Avalonia App 프로젝트 생성
 - Lcms 어댑터와 테스트 프로젝트 생성
