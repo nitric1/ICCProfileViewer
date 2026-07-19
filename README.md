@@ -35,7 +35,7 @@ dotnet run --project ICCProfileViewer.App
 
 When `ICCProfileViewer.App` is selected as the Visual Studio startup project, choose the `ICCProfileViewer.App (Local LittleCMS)` launch profile. It sets the working directory to the repository root and injects `ICC_PROFILE_VIEWER_LCMS_PATH=Artifacts\native\win-x64\Release\lcms2.dll` automatically.
 
-Use **Open Profile** to select an `.icc` or `.icm` file. The application reads ICC v2/v4 metadata and displays the profile summary and tag table without requiring a temporary file. It remains open when Little-CMS is unavailable and displays a native-dependency diagnostic instead.
+Use **Open Profile** to select an `.icc` or `.icm` file, or drag one profile file onto the application window. The application reads ICC v2/v4 metadata and displays the profile summary and tag table without requiring a temporary file. It remains open when Little-CMS is unavailable and displays a native-dependency diagnostic instead.
 
 Chromaticity calculation and diagram rendering are subsequent implementation steps.
 

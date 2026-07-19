@@ -146,6 +146,28 @@
       </Grid>
     </Grid>
 
+    <Border Grid.Row="1"
+            IsVisible="{Binding IsDropTargetVisible}"
+            IsHitTestVisible="False"
+            Margin="24"
+            Padding="32"
+            CornerRadius="12"
+            BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+            BorderThickness="3"
+            Background="{DynamicResource ThemeControlLowBrush}">
+      <StackPanel HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Spacing="10">
+        <TextBlock Text="{Binding DropTargetMessage}"
+                   HorizontalAlignment="Center"
+                   FontSize="24"
+                   FontWeight="SemiBold" />
+        <TextBlock Text="Only one profile can be opened at a time."
+                   HorizontalAlignment="Center"
+                   Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+      </StackPanel>
+    </Border>
+
     <Border Grid.Row="2"
             Padding="14,9"
             BorderBrush="{DynamicResource ThemeBorderLowBrush}"

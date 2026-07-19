@@ -646,7 +646,7 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 
 ### 단계 2: 프로필 메타데이터
 
-상태: 진행 중. Storage Provider 기반 `.icc`/`.icm` 파일 선택, 취소 가능한 비동기 파싱, v2/v4 메타데이터와 tag 목록 표시, 손상된 프로필 및 native dependency 오류 상태를 구현했다. drag-and-drop과 별도 진단 로그는 남아 있다.
+상태: 진행 중. Storage Provider 기반 `.icc`/`.icm` 파일 선택과 단일 파일 drag-and-drop, 취소 가능한 비동기 파싱, v2/v4 메타데이터와 tag 목록 표시, 손상된 프로필 및 native dependency 오류 상태를 구현했다. 별도 진단 로그는 남아 있다.
 
 - 파일 선택 및 drag-and-drop
 - 비동기 파싱과 취소

@@ -158,6 +158,28 @@ public sealed class MainWindowViewModelTests
     }
 
     [TestMethod]
+    public void DropTargetState_UpdatesVisibilityAndAcceptanceMessage()
+    {
+        using var viewModel = CreateViewModel(
+            new NativeRuntimeStatus(true, "ready", null));
+
+        viewModel.ShowDropTarget(acceptsProfile: false);
+
+        Assert.IsTrue(viewModel.IsDropTargetVisible);
+        Assert.IsFalse(viewModel.CanAcceptDrop);
+        StringAssert.Contains(viewModel.DropTargetMessage, ".icc");
+
+        viewModel.ShowDropTarget(acceptsProfile: true);
+
+        Assert.IsTrue(viewModel.CanAcceptDrop);
+        StringAssert.Contains(viewModel.DropTargetMessage, "Drop to open");
+
+        viewModel.HideDropTarget();
+
+        Assert.IsFalse(viewModel.IsDropTargetVisible);
+    }
+
+    [TestMethod]
     public void OverlayProperties_RaisePropertyChangedOnlyWhenValueChanges()
     {
         using var viewModel = CreateViewModel(

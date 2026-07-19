@@ -21,6 +21,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     private string nativeRuntimeSummary;
     private string? diagnosticMessage;
     private string statusMessage;
+    private bool isDropTargetVisible;
+    private bool canAcceptDrop;
     private bool showSrgb = true;
     private bool showDisplayP3;
     private bool showDciP3;
@@ -64,6 +66,14 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     public bool HasDiagnosticMessage => DiagnosticMessage is not null;
 
     public string StatusMessage => statusMessage;
+
+    public bool IsDropTargetVisible => isDropTargetVisible;
+
+    public bool CanAcceptDrop => canAcceptDrop;
+
+    public string DropTargetMessage => CanAcceptDrop
+        ? "Drop to open this color profile"
+        : "Drop one .icc or .icm file";
 
     public string ProfileName => profile?.DisplayName ?? "No profile loaded";
 
@@ -261,6 +271,19 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         SetStatusMessage("Could not open the system file picker.");
         SetState(ApplicationViewState.UnexpectedError);
     }
+
+    public void ShowDropTarget(bool acceptsProfile)
+    {
+        if (SetProperty(ref canAcceptDrop, acceptsProfile, nameof(CanAcceptDrop)))
+        {
+            OnPropertyChanged(nameof(DropTargetMessage));
+        }
+
+        SetProperty(ref isDropTargetVisible, true, nameof(IsDropTargetVisible));
+    }
+
+    public void HideDropTarget() =>
+        SetProperty(ref isDropTargetVisible, false, nameof(IsDropTargetVisible));
 
     private static string DisplayOrEmpty(string? value) =>
         string.IsNullOrWhiteSpace(value) ? "—" : value;
