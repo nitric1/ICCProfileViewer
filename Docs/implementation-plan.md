@@ -449,7 +449,7 @@ UI 명칭은 다음 정책을 따른다.
 - 일반 디스플레이 비교 항목은 `Display P3`로 표시한다.
 - 디지털 시네마 기준은 `DCI-P3 (DCI white)`로 표시한다.
 - `P3-D65`라는 모호한 단독 명칭은 사용하지 않는다.
-- Display P3와 DCI-P3 D65는 2차원 원색 삼각형과 백색점이 같지만 전달 함수가 다르다는 설명을 도움말에 제공한다.
+- Display P3와 DCI-P3는 2차원 원색 삼각형이 같지만 백색점과 전달 함수가 다르다는 설명을 도움말에 제공한다.
 
 ## 10. 다이어그램 렌더링
 
@@ -658,7 +658,7 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 
 ### 단계 3: 색도 계산 엔진
 
-상태: 진행 중. `XyChromaticity`, `UvPrimeChromaticity` 좌표 타입과 scale-invariant `XYZ -> xy`, `XYZ -> u'v'`, `xy <-> u'v'` 변환 및 undefined/non-finite 입력 처리를 구현했다. 기준 색역, spectral locus, Matrix/TRC gamut 추출과 chromatic adaptation 검증은 남아 있다.
+상태: 진행 중. `XyChromaticity`, `UvPrimeChromaticity` 좌표 타입과 scale-invariant `XYZ -> xy`, `XYZ -> u'v'`, `xy <-> u'v'` 변환 및 undefined/non-finite 입력 처리, sRGB·Display P3·DCI-P3·Adobe RGB (1998)·BT.2020 기준 색역 카탈로그를 구현했다. spectral locus, Matrix/TRC gamut 추출과 chromatic adaptation 검증은 남아 있다.
 
 - 색도 좌표 타입과 변환식
 - 기준 색역 정의
