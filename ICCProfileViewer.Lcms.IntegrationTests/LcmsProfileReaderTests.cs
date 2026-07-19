@@ -2,6 +2,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using ICCProfileViewer.Core.Colorimetry;
+using ICCProfileViewer.Core.Profiles;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ICCProfileViewer.Lcms.IntegrationTests;
@@ -90,6 +91,25 @@ public sealed class LcmsProfileReaderTests
     }
 
     [TestMethod]
+    public async Task ReadAsync_WithChadMatrixProfile_MatchesDirectInverseAdaptation()
+    {
+        await using var stream = File.OpenRead(TestRepository.ProfilePath("crayons.icc"));
+
+        var profile = await reader.ReadAsync(stream, "crayons.icc", CancellationToken.None);
+        var directlyCalculated =
+            MatrixTrcGamutCalculator.FromChromaticAdaptationTag(profile.ColorTags);
+
+        Assert.IsTrue(profile.IsMatrixShaper);
+        Assert.IsNotNull(profile.ColorTags.ChromaticAdaptationMatrix);
+        Assert.IsNotNull(profile.Gamut);
+        Assert.IsNotNull(directlyCalculated);
+        AssertPointMatches(profile.Gamut.Red, directlyCalculated.Red);
+        AssertPointMatches(profile.Gamut.Green, directlyCalculated.Green);
+        AssertPointMatches(profile.Gamut.Blue, directlyCalculated.Blue);
+        AssertPointMatches(profile.Gamut.WhitePoint, directlyCalculated.WhitePoint);
+    }
+
+    [TestMethod]
     public async Task ReadAsync_AllowsNullPaddingAfterDeclaredProfileSize()
     {
         var profileBytes = await File.ReadAllBytesAsync(TestRepository.ProfilePath("test5.icc"));
@@ -139,5 +159,15 @@ public sealed class LcmsProfileReaderTests
     {
         Assert.AreEqual(expectedX, actual.X, 0.0001);
         Assert.AreEqual(expectedY, actual.Y, 0.0001);
+    }
+
+    private static void AssertPointMatches(
+        ChromaticityPoint transformed,
+        ChromaticityPoint directlyCalculated)
+    {
+        Assert.AreEqual(transformed.Xy.X, directlyCalculated.Xy.X, 0.0001);
+        Assert.AreEqual(transformed.Xy.Y, directlyCalculated.Xy.Y, 0.0001);
+        Assert.AreEqual(transformed.UvPrime.UPrime, directlyCalculated.UvPrime.UPrime, 0.0001);
+        Assert.AreEqual(transformed.UvPrime.VPrime, directlyCalculated.UvPrime.VPrime, 0.0001);
     }
 }
