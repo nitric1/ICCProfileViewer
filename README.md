@@ -33,6 +33,8 @@ $env:ICC_PROFILE_VIEWER_LCMS_PATH = "$PWD\Artifacts\native\win-x64\Release\lcms2
 dotnet run --project ICCProfileViewer.App
 ```
 
+When `ICCProfileViewer.App` is selected as the Visual Studio startup project, choose the `ICCProfileViewer.App (Local LittleCMS)` launch profile. It sets the working directory to the repository root and injects `ICC_PROFILE_VIEWER_LCMS_PATH=Artifacts\native\win-x64\Release\lcms2.dll` automatically.
+
 The shell still starts when Little-CMS is unavailable and displays a native-dependency diagnostic. Profile selection and diagram rendering are subsequent implementation steps.
 
 See [Docs/native-build.md](Docs/native-build.md) for prerequisites, outputs, troubleshooting, and the post-MVP macOS/Linux policy.

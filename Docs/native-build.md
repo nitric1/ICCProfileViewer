@@ -108,6 +108,18 @@ The test suite also starts an isolated helper process to verify all Windows look
 3. the default Windows loader with a separately supplied `PATH` entry
 4. an actionable error for a missing explicitly configured DLL
 
+### 2.5 Visual Studio Launch Profile
+
+`ICCProfileViewer.App/Properties/launchSettings.json` provides the `ICCProfileViewer.App (Local LittleCMS)` profile. Select it next to Visual Studio's Start button when `ICCProfileViewer.App` is the startup project.
+
+The profile uses the repository root as its working directory and injects:
+
+```text
+ICC_PROFILE_VIEWER_LCMS_PATH=Artifacts\native\win-x64\Release\lcms2.dll
+```
+
+Run `build-lcms.cmd Release x64` first. The launch profile is for local development only and is not included in publish output.
+
 ## 3. macOS and Linux
 
 macOS and Linux support is planned after the MVP. Neither platform is officially supported until it has been tested on physical hardware or in CI.

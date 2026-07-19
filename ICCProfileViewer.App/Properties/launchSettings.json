@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "ICCProfileViewer.App (Local LittleCMS)": {
+      "commandName": "Project",
+      "workingDirectory": "..",
+      "environmentVariables": {
+        "ICC_PROFILE_VIEWER_LCMS_PATH": "Artifacts\\native\\win-x64\\Release\\lcms2.dll"
+      }
+    }
+  }
+}
