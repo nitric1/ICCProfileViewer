@@ -41,7 +41,7 @@ Expand **Diagnostics** at the bottom of the window to inspect and copy the bound
 
 For supported RGB Matrix/TRC profiles, the application displays CIE 1931 `xy` and CIE 1976 `u'v'` chromaticity diagrams. Use the legend controls to independently compare the profile with sRGB, Display P3, DCI-P3 (DCI white), Adobe RGB (1998), and BT.2020. Hover over a diagram to inspect coordinates and double-click to copy the current coordinate. Profiles without a supported gamut remain available for metadata inspection and are not shown as an inaccurate triangle.
 
-See [Docs/native-build.md](Docs/native-build.md) for prerequisites, outputs, troubleshooting, and the post-MVP macOS/Linux policy.
+See [Docs/native-build.md](Docs/native-build.md) for Windows native build prerequisites, toolchain selection, outputs, and troubleshooting.
 
 ## Windows x64 Single-File Release
 

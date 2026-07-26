@@ -115,7 +115,7 @@ ICCProfileViewer.slnx
 ├─ TestData/Profiles/
 ├─ Docs/
 │  ├─ implementation-plan.md
-│  └─ native-build.md             MVP Windows script 및 향후 macOS/Linux 설치 매뉴얼
+│  └─ native-build.md             Windows x64 native build 매뉴얼
 └─ Directory.Packages.props
 ```
 
@@ -323,7 +323,7 @@ macOS:
 brew install little-cms2
 ```
 
-Linux의 대표적인 package 이름은 다음과 같다. 실제 명령과 지원 version은 `Docs/native-build.md`에서 지원 배포판별로 검증한다.
+Linux의 대표적인 package 이름은 다음과 같다. 실제 명령과 지원 version은 해당 플랫폼 지원을 시작할 때 별도 문서에서 지원 배포판별로 검증한다.
 
 ```bash
 # Debian / Ubuntu
@@ -354,7 +354,7 @@ meson compile -C Artifacts/native/<rid>/<config>/build
 
 upstream은 현재 Meson 지원을 “testing”으로 표시한다. Meson에서 문제가 발생하면 CMake 또는 Autotools를 사용한다. 앱에는 core `lcms2` shared library만 필요하므로 source build에서는 JPEG/TIFF utilities와 불필요한 도구를 끈 최소 구성을 사용한다.
 
-`Docs/native-build.md`에는 우선 `build-lcms.cmd` 사용법, submodule 초기화, 예상 출력 파일, 앱 로컬 복사 위치, 진단 명령을 기록한다. macOS와 Linux의 package 설치 및 source-build 절차는 해당 플랫폼 지원을 시작할 때 검증해 추가한다. `.slnx` build는 이 script나 package manager를 실행하지 않는다.
+`Docs/native-build.md`에는 `build-lcms.cmd` 사용법, submodule 초기화, toolchain 선택, 예상 출력 파일, 진단 방법을 기록한다. macOS와 Linux의 package 설치 및 source-build 절차는 해당 플랫폼 지원을 시작할 때 별도 플랫폼 문서에 추가한다. `.slnx` build는 이 script나 package manager를 실행하지 않는다.
 
 ### 6.5 수동 artifact와 배포 정책
 
@@ -548,7 +548,7 @@ ViewModel은 다음 상태를 명시적으로 갖는다.
 
 진단 로그는 MVP에서 최대 200개 항목을 보관하는 메모리 ring buffer로 구현한다. UTC timestamp, level, event name, 메시지와 예외 세부 정보를 기록하며 자동으로 디스크에 쓰지 않는다. 사용자는 앱 하단의 접이식 Diagnostics 패널에서 로그를 선택해 복사할 수 있다.
 
-LittleCMS가 설치되지 않았더라도 프로세스가 시작 단계에서 종료되어서는 안 된다. `NativeLibraryBootstrapper.TryInitialize` 형태로 native dependency를 먼저 검사하고, 실패하면 프로필 열기 기능을 비활성화한 상태에서 `Docs/native-build.md`에 대응하는 설치·앱 로컬 복사 안내를 표시한다.
+LittleCMS가 설치되지 않았더라도 프로세스가 시작 단계에서 종료되어서는 안 된다. `NativeLibraryBootstrapper.TryInitialize` 형태로 native dependency를 먼저 검사하고, 실패하면 프로필 열기 기능을 비활성화한 상태에서 `Docs/native-build.md`에 대응하는 native build 안내를 표시한다.
 
 ## 13. 테스트 전략
 
@@ -662,7 +662,7 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 - Avalonia App 프로젝트 생성
 - Lcms 어댑터와 테스트 프로젝트 생성
 - 저장소 루트 `build-lcms.cmd` 구현
-- `Docs/native-build.md`에 Windows script와 수동 설치 절차 작성
+- `Docs/native-build.md`에 Windows native build 절차 작성
 - Central Package Management 도입
 - 의존성 방향 검증
 - 기본 CI build/test 구성
