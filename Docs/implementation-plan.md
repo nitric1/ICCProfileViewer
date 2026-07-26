@@ -254,7 +254,8 @@ git -C External/Little-CMS rev-parse HEAD
 
 - 개발자 또는 릴리스 담당자가 수동으로 빌드한 shared library를 실행 파일 옆 또는 문서에 지정한 native 경로에 둔다.
 - 저장소에는 shared library를 커밋하지 않는다.
-- 공개 배포물을 self-contained 형태로 제공할 경우 이 방식으로 native library를 publish 결과에 수동으로 포함한다.
+- 개발 실행과 통합 테스트에서는 shared library를 실행 파일 옆 또는 명시 경로에 둔다.
+- Windows x64 공개 배포물에서는 준비된 `lcms2.dll`을 .NET single-file bundle에 포함한다. 네이티브 파일은 실행 시 .NET host가 사용자 임시 디렉터리에 추출한다.
 
 `NativeLibraryBootstrapper`의 탐색 순서는 다음을 목표로 한다.
 
@@ -618,22 +619,18 @@ dotnet build ICCProfileViewer.slnx -c Debug
 
 이 build는 native library가 없어도 compile까지 완료될 수 있다. 애플리케이션 실행과 LittleCMS 통합 테스트에는 시스템 설치본 또는 앱 로컬 library가 필요하다. `--self-contained true`는 .NET runtime을 포함한다는 뜻이며 LittleCMS까지 자동으로 포함한다는 뜻은 아니다.
 
-예상 publish 명령은 다음과 같다.
+Windows x64 공개 배포는 저장소 루트 script로 생성한다.
 
 ```powershell
-dotnet publish ICCProfileViewer.App -c Release -r win-x64 --self-contained true
+.\build-lcms.cmd Release x64
+.\publish-win-x64.cmd
 ```
 
-publish 방식은 다음 두 가지 중 릴리스 정책으로 선택한다.
-
-- 시스템 의존형: native library를 포함하지 않고 설치 요구사항을 배포 문서에 명시한다.
-- 앱 로컬형: 릴리스 담당자가 미리 준비한 native library를 publish 결과에 수동 복사한다.
-
-MVP 앱 로컬형 공개 배포물은 Windows x64 환경에서 native artifact를 준비하고 실제 실행을 검증한 뒤 최종 패키징한다.
+`publish-win-x64.cmd`는 `WinX64SingleFile.pubxml`을 사용해 .NET runtime, Avalonia native dependency, `lcms2.dll`을 하나의 self-contained 실행 파일에 포함한다. 최종 출력은 `Artifacts/publish/win-x64-single-file/ICCProfileViewer.exe` 한 파일이다. 시스템 설치본과 실행 파일 옆의 앱 로컬 library 탐색은 개발 및 별도 배포 시나리오를 위해 계속 지원한다.
 
 배포 형태는 다음을 목표로 한다.
 
-- Windows x64: zip 우선, 이후 MSIX 또는 installer 검토
+- Windows x64: 단일 EXE 우선, 이후 MSIX 또는 installer 검토
 
 macOS와 Linux의 publish 명령 및 패키징 형식은 MVP 이후 해당 플랫폼을 실제로 지원하고 테스트할 때 확정한다.
 
@@ -702,9 +699,11 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 
 ### 단계 5: Windows x64 배포
 
-- 시스템 의존형과 앱 로컬형 배포 정책 확정
-- 앱 로컬형이면 Windows x64 native artifact를 수동 준비하고 publish 결과에 복사
-- Windows x64 self-contained publish
+상태: 진행 중 (2026-07-27). .NET runtime, Avalonia native dependency, `lcms2.dll`을 포함하는 Windows x64 단일 EXE 게시 프로필과 root script를 구현하고, 게시 결과가 한 파일인지와 번들에서 추출된 Little-CMS가 실제 로드되는지 확인했다. Clean Windows 10/11 검증과 라이선스 고지는 남아 있다.
+
+- 공개 배포 정책: 준비된 Windows x64 `lcms2.dll`을 포함한 단일 self-contained EXE
+- `WinX64SingleFile.pubxml`과 `publish-win-x64.cmd`
+- 게시 결과가 `ICCProfileViewer.exe` 한 파일인지 자동 검증
 - Windows 10/11 x64 clean machine 검증
 - 라이선스 및 ThirdPartyNotices 포함
 

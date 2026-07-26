@@ -20,4 +20,33 @@
     <PackageReference Include="Avalonia.Themes.Fluent" />
   </ItemGroup>
 
+  <PropertyGroup Condition="'$(BundleLcmsNativeLibrary)' == 'true'">
+    <LcmsNativeLibraryPath Condition="'$(LcmsNativeLibraryPath)' == ''">$(MSBuildProjectDirectory)\..\Artifacts\native\win-x64\Release\lcms2.dll</LcmsNativeLibraryPath>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(BundleLcmsNativeLibrary)' == 'true'">
+    <Content Include="$(LcmsNativeLibraryPath)" Link="lcms2.dll">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <ExcludeFromSingleFile>false</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
+  <Target
+    Name="ValidateBundledLcmsNativeLibrary"
+    BeforeTargets="PrepareForPublish"
+    Condition="'$(BundleLcmsNativeLibrary)' == 'true'">
+    <Error
+      Condition="'$(RuntimeIdentifier)' != 'win-x64'"
+      Text="Bundled Little-CMS publishing currently supports only the win-x64 runtime identifier." />
+    <Error
+      Condition="'$(PublishSingleFile)' != 'true'"
+      Text="Bundled Little-CMS publishing requires PublishSingleFile=true." />
+    <Error
+      Condition="'$(IncludeNativeLibrariesForSelfExtract)' != 'true'"
+      Text="Bundled Little-CMS publishing requires IncludeNativeLibrariesForSelfExtract=true." />
+    <Error
+      Condition="!Exists('$(LcmsNativeLibraryPath)')"
+      Text="Little-CMS was not found at '$(LcmsNativeLibraryPath)'. Run build-lcms.cmd Release x64 before publishing." />
+  </Target>
+
 </Project>

@@ -15,6 +15,7 @@
 bin
 obj
 /Artifacts/
+/.tmp/
 
 # NuGet Packages
 *.nupkg

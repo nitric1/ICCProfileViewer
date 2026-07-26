@@ -120,6 +120,24 @@ ICC_PROFILE_VIEWER_LCMS_PATH=Artifacts\native\win-x64\Release\lcms2.dll
 
 Run `build-lcms.cmd Release x64` first. The launch profile is for local development only and is not included in publish output.
 
+### 2.6 Publishing a Single Executable
+
+After preparing the Release x64 native artifact, run this command from the repository root:
+
+```powershell
+.\publish-win-x64.cmd
+```
+
+The script uses `ICCProfileViewer.App/Properties/PublishProfiles/WinX64SingleFile.pubxml` to create a self-contained `win-x64` single-file release. It embeds the .NET runtime, Avalonia native dependencies, and `lcms2.dll`, removes publish-only symbol files, and verifies that the output directory contains exactly one file:
+
+```text
+Artifacts/publish/win-x64-single-file/ICCProfileViewer.exe
+```
+
+The native library must exist at `Artifacts/native/win-x64/Release/lcms2.dll` before publishing. It is included in the executable during the single-file bundling step, so copying it after `dotnet publish` is not equivalent.
+
+At run time, the .NET single-file host extracts bundled native libraries under `%TEMP%/.net`. The application does not require `ICC_PROFILE_VIEWER_LCMS_PATH`, a separately installed .NET runtime, or a separately installed Little-CMS runtime for this release format.
+
 ## 3. macOS and Linux
 
 macOS and Linux support is planned after the MVP. Neither platform is officially supported until it has been tested on physical hardware or in CI.
