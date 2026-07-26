@@ -6,7 +6,7 @@
         x:Class="ICCProfileViewer.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="{Binding WindowTitle}"
-        Width="1280"
+        Width="1340"
         Height="800"
         MinWidth="960"
         MinHeight="640"
