@@ -32,10 +32,18 @@ if errorlevel 1 (
     exit /b 5
 )
 
+if exist "%OUTPUT_DIR%\ThirdPartyNotices" (
+    rmdir /s /q "%OUTPUT_DIR%\ThirdPartyNotices"
+    if errorlevel 1 (
+        echo ERROR: Could not remove the previous generated notice directory.
+        exit /b 6
+    )
+)
+
 for /d %%D in ("%OUTPUT_DIR%\*") do (
     echo ERROR: The output directory contains an unexpected subdirectory: "%%~fD".
     echo Remove it and run this script again.
-    exit /b 6
+    exit /b 7
 )
 
 del /q "%OUTPUT_DIR%\*" >nul 2>nul
@@ -60,7 +68,12 @@ del /q "%OUTPUT_DIR%\*.pdb" >nul 2>nul
 
 if not exist "%OUTPUT_EXE%" (
     echo ERROR: Publish completed but "%OUTPUT_EXE%" was not found.
-    exit /b 7
+    exit /b 8
+)
+
+for /d %%D in ("%OUTPUT_DIR%\*") do (
+    echo ERROR: Publish produced an unexpected subdirectory: "%%~fD".
+    exit /b 9
 )
 
 set "PUBLISHED_FILE_COUNT=0"
@@ -68,7 +81,7 @@ for /f "delims=" %%F in ('dir /b /a-d "%OUTPUT_DIR%"') do set /a PUBLISHED_FILE_
 if not "%PUBLISHED_FILE_COUNT%"=="1" (
     echo ERROR: Expected one published file, but found %PUBLISHED_FILE_COUNT% in "%OUTPUT_DIR%".
     dir /b /a-d "%OUTPUT_DIR%"
-    exit /b 8
+    exit /b 10
 )
 
 for %%F in ("%OUTPUT_EXE%") do set "OUTPUT_SIZE=%%~zF"

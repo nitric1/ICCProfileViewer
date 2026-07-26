@@ -1,0 +1,41 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ICCProfileViewer.App.Views.ThirdPartyNoticesWindow"
+        Title="Third-party notices"
+        Width="820"
+        Height="640"
+        MinWidth="560"
+        MinHeight="420"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="20">
+    <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,14">
+      <TextBlock Text="Third-party notices"
+                 FontSize="22"
+                 FontWeight="SemiBold" />
+      <TextBlock Text="License and attribution information for software and data included with ICC Profile Viewer."
+                 TextWrapping="Wrap"
+                 Foreground="{DynamicResource ThemeForegroundLowBrush}" />
+    </StackPanel>
+
+    <TextBox x:Name="NoticeText"
+             Grid.Row="1"
+             IsReadOnly="True"
+             AcceptsReturn="True"
+             TextWrapping="Wrap"
+             FontFamily="Consolas"
+             FontSize="12"
+             Padding="12"
+             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+             ScrollViewer.VerticalScrollBarVisibility="Auto" />
+
+    <Button Grid.Row="2"
+            Content="Close"
+            HorizontalAlignment="Right"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+            Margin="0,14,0,0"
+            MinWidth="88"
+            Click="CloseClick" />
+  </Grid>
+</Window>

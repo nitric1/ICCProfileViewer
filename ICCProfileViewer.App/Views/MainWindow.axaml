@@ -16,7 +16,7 @@
             Padding="16,12"
             BorderBrush="{DynamicResource ThemeBorderLowBrush}"
             BorderThickness="0,0,0,1">
-      <Grid ColumnDefinitions="Auto,16,*,Auto" VerticalAlignment="Center">
+      <Grid ColumnDefinitions="Auto,16,*,Auto,12,Auto" VerticalAlignment="Center">
         <Button Grid.Column="0"
                 Content="Open Profile"
                 IsEnabled="{Binding CanOpenProfile}"
@@ -38,6 +38,23 @@
                 Background="{DynamicResource ThemeControlLowBrush}">
           <TextBlock Text="{Binding StateName}" FontSize="12" />
         </Border>
+        <Button Grid.Column="5"
+                Content="⋯"
+                Width="40"
+                Height="32"
+                Padding="0"
+                FontSize="20"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                AutomationProperties.Name="More options"
+                ToolTip.Tip="More options">
+          <Button.Flyout>
+            <MenuFlyout Placement="BottomEdgeAlignedRight">
+              <MenuItem Header="Third-party notices"
+                        Click="ThirdPartyNoticesClick" />
+            </MenuFlyout>
+          </Button.Flyout>
+        </Button>
       </Grid>
     </Border>
 

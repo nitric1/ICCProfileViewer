@@ -59,3 +59,5 @@ Artifacts/publish/win-x64-single-file/ICCProfileViewer.exe
 ```
 
 The executable includes the .NET runtime, Avalonia native dependencies, and `lcms2.dll`. No separately installed .NET or Little-CMS runtime is required. The .NET single-file host extracts bundled native libraries under the user's temporary directory at run time.
+
+Use **Third-party notices** in the main window to view the license and attribution information embedded in the executable.

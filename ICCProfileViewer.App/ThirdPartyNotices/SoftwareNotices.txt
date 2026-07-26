@@ -1,0 +1,77 @@
+ICC Profile Viewer
+Third-Party Notices
+===================
+
+This application incorporates third-party software and data. The following
+notices are provided for attribution and license compliance.
+
+
+MIT-licensed software
+---------------------
+
+The following components are licensed under the MIT License:
+
+- Avalonia UI 12.1.0
+  Copyright 2013-2026 The AvaloniaUI Project
+  https://avaloniaui.net/
+
+- Little CMS 2.19.1
+  Copyright (c) 2023 Marti Maria Saguer
+  https://github.com/mm2/Little-CMS
+
+- lcmsNET 1.2.1
+  Copyright (c) 2019-2026 John Stevenson-Hoare
+  https://github.com/jrshoare/lcmsNET
+
+- SkiaSharp 3.119.4 and HarfBuzzSharp 8.3.1.3
+  Copyright (c) 2015-2016 Xamarin, Inc.
+  Copyright (c) 2017-2018 Microsoft Corporation
+  https://github.com/mono/SkiaSharp
+
+- MicroCom.Runtime 0.11.6
+  Copyright 2021 Nikita Tsukanov
+  https://github.com/AvaloniaUI/Avalonia
+
+- Tmds.DBus.Protocol 0.94.1
+  Copyright Tom Deseyn
+  https://github.com/tmds/Tmds.DBus
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+Microsoft .NET
+--------------
+
+This self-contained application includes the Microsoft .NET 10 runtime.
+
+License:
+https://github.com/dotnet/runtime/blob/main/LICENSE.TXT
+
+Third-party notices:
+https://github.com/dotnet/runtime/blob/main/THIRD-PARTY-NOTICES.TXT
+
+
+Additional notices
+------------------
+
+The complete attribution for the CIE 1931 spectrum-locus dataset follows.
+The package-provided SkiaSharp native-assets notices and Avalonia ANGLE
+license follow after the CIE notice.

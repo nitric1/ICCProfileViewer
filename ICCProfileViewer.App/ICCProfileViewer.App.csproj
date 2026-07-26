@@ -7,6 +7,8 @@
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <SkiaSharpNativeAssetsVersion>3.119.4</SkiaSharpNativeAssetsVersion>
+    <AvaloniaAngleNativeAssetsVersion>2.1.27548.20260419</AvaloniaAngleNativeAssetsVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +20,18 @@
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.Desktop" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource
+      Include="ThirdPartyNotices/SoftwareNotices.txt"
+      LogicalName="ICCProfileViewer.App.ThirdPartyNotices.SoftwareNotices.txt" />
+    <EmbeddedResource
+      Include="$(NuGetPackageRoot)skiasharp.nativeassets.win32/$(SkiaSharpNativeAssetsVersion)/THIRD-PARTY-NOTICES.txt"
+      LogicalName="ICCProfileViewer.App.ThirdPartyNotices.SkiaSharpNativeAssets.txt" />
+    <EmbeddedResource
+      Include="$(NuGetPackageRoot)avalonia.angle.windows.natives/$(AvaloniaAngleNativeAssetsVersion)/LICENSE"
+      LogicalName="ICCProfileViewer.App.ThirdPartyNotices.AvaloniaAngleNativeAssets.txt" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(BundleLcmsNativeLibrary)' == 'true'">

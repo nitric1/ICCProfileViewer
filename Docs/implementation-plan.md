@@ -699,13 +699,13 @@ Native AOT와 trimming은 첫 릴리스 범위에서 제외한다. `lcmsNET`, re
 
 ### 단계 5: Windows x64 배포
 
-상태: 진행 중 (2026-07-27). .NET runtime, Avalonia native dependency, `lcms2.dll`을 포함하는 Windows x64 단일 EXE 게시 프로필과 root script를 구현하고, 게시 결과가 한 파일인지와 번들에서 추출된 Little-CMS가 실제 로드되는지 확인했다. Clean Windows 10/11 검증과 라이선스 고지는 남아 있다.
+상태: 진행 중 (2026-07-27). .NET runtime, Avalonia native dependency, `lcms2.dll`을 포함하는 Windows x64 단일 EXE 게시 프로필과 root script를 구현하고, 게시 결과가 한 파일인지와 번들에서 추출된 Little-CMS가 실제 로드되는지 확인했다. CIE 데이터와 배포 의존성의 라이선스 고지는 EXE에 embedded resource로 포함하고 앱에서 열람할 수 있게 했다. Clean Windows 10/11 검증은 남아 있다.
 
 - 공개 배포 정책: 준비된 Windows x64 `lcms2.dll`을 포함한 단일 self-contained EXE
 - `WinX64SingleFile.pubxml`과 `publish-win-x64.cmd`
 - 게시 결과가 `ICCProfileViewer.exe` 한 파일인지 자동 검증
 - Windows 10/11 x64 clean machine 검증
-- 라이선스 및 ThirdPartyNotices 포함
+- EXE 내부 Third-party notices 화면
 
 ### 단계 6: MVP 이후 플랫폼 확장
 

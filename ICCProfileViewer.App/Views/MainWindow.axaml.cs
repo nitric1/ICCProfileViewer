@@ -51,6 +51,14 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    private async void ThirdPartyNoticesClick(
+        object? sender,
+        RoutedEventArgs eventArgs)
+    {
+        var window = new ThirdPartyNoticesWindow();
+        await window.ShowDialog(this);
+    }
+
     private void ProfileDragOver(object? sender, DragEventArgs eventArgs)
     {
         var canAccept = TryGetDroppedProfile(eventArgs.DataTransfer, out _)

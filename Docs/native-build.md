@@ -162,6 +162,6 @@ When updating the Little-CMS submodule, verify all of the following:
 2. The `Projects/VCyyyy` directory, solution, `lcms2_DLL` target, and output paths
 3. `lcmsNET` compatibility and the native version actually loaded at runtime
 4. Integration tests using ICC v2 and v4 fixtures
-5. Version references in `build-lcms.cmd`, this document, and the open-source notices
+5. Version references in `build-lcms.cmd` and this document
 
 Commit the submodule gitlink only after validating the selected release commit. Do not commit compiled DLLs to the repository.
