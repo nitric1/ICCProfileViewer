@@ -162,7 +162,7 @@ public static class NativeLibraryBootstrapper
             $"Set {LibraryPathEnvironmentVariable} to a compatible lcms2.dll, copy lcms2.dll next to the application, " +
             $"or install it in the operating system's library search path. {configuredPathDetails} " +
             "Repository builds can create the Windows x64 library by running build-lcms.cmd from a Visual Studio Developer shell; " +
-            "see Docs/native-build.md.";
+            "see Docs/native-build-windows-x64.md.";
     }
 
     private static string FormatVersion(int encodedVersion)
