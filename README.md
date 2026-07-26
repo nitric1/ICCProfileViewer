@@ -2,9 +2,52 @@
 
 The implementation plan targets a .NET 10 and Avalonia ICC profile metadata and chromaticity diagram viewer.
 
+## Prerequisites
+
+The MVP is officially supported and tested only on Windows 10/11 x64. The macOS and Linux prerequisites below are provided for source development; those platforms are not yet officially supported or tested by this project.
+
+All platforms require:
+
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+
+### Windows x64
+
+- Visual Studio or Visual Studio Build Tools with the `Desktop development with C++` workload
+- A Visual Studio Developer Command Prompt or Developer PowerShell
+
+See [Docs/native-build-windows-x64.md](Docs/native-build-windows-x64.md) for native build instructions, toolchain selection, outputs, and troubleshooting.
+
+### macOS
+
+Install Little CMS with [Homebrew](https://brew.sh/):
+
+```bash
+brew install little-cms2
+export ICC_PROFILE_VIEWER_LCMS_PATH="$(brew --prefix little-cms2)/lib/liblcms2.dylib"
+```
+
+Avalonia uses its own macOS backend, so the .NET macOS workload is not required for this project.
+
+### Linux
+
+Install the Little CMS development package so the unversioned `liblcms2.so` name used by `lcmsNET` is available:
+
+```bash
+# Debian / Ubuntu
+sudo apt install liblcms2-dev
+
+# Fedora
+sudo dnf install lcms2-devel
+
+# Arch Linux
+sudo pacman -S lcms2
+```
+
+A graphical X11 environment and the distribution-specific [Avalonia native dependencies](https://docs.avaloniaui.net/docs/supported-platforms) are also required. If Little CMS is not found through the system loader, set `ICC_PROFILE_VIEWER_LCMS_PATH` to the full path of the installed `liblcms2.so` or `liblcms2.so.2`.
+
 ## Development
 
-Initialize the Little-CMS submodule after cloning:
+For a Git checkout, initialize the Little-CMS submodule when building the bundled Windows native library:
 
 ```powershell
 git submodule update --init --recursive
@@ -40,8 +83,6 @@ Use **Open Profile** to select an `.icc` or `.icm` file, or drag one profile fil
 Expand **Diagnostics** at the bottom of the window to inspect and copy the bounded in-memory log. It records the runtime environment, resolved Little-CMS version and location, profile load results, cancellations, and exception details without writing log files to disk.
 
 For supported RGB Matrix/TRC profiles, the application displays CIE 1931 `xy` and CIE 1976 `u'v'` chromaticity diagrams. Use the legend controls to independently compare the profile with sRGB, Display P3, DCI-P3 (DCI white), Adobe RGB (1998), and BT.2020. Hover over a diagram to inspect coordinates and double-click to copy the current coordinate. Profiles without a supported gamut remain available for metadata inspection and are not shown as an inaccurate triangle.
-
-See [Docs/native-build-windows-x64.md](Docs/native-build-windows-x64.md) for Windows native build prerequisites, toolchain selection, outputs, and troubleshooting.
 
 ## Windows x64 Single-File Release
 
